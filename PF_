@@ -1,0 +1,370 @@
+import tkinter as tk
+from tkinter import messagebox
+import os
+import time
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
+
+
+class Estudiante:
+    def __init__(self, paginas, busqueda):
+        self.paginas = paginas
+        self.busqueda = busqueda
+
+
+class SitiosWeb:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("WEB SCRAPING")
+        self.master.geometry("1200x600")
+        self.master.config(bg="#77ACF1")
+
+        def brillo():
+            current_color = labelNombre.cget("fg")
+            new_color = "#3E00FF" if current_color == "white" else "white"
+            labelNombre.config(fg=new_color)
+            root.after(900, brillo)
+
+        labelNombre = tk.Label(root, text="¡WEB SCRAPING!", fg="white", bg="#77ACF1",
+                               font=("Cheddar", 60, "bold"))
+        labelNombre.pack(pady=10)
+
+        brillo()
+
+
+        # Barra para escribir producto
+        self.labelBusqueda = tk.Label(master, text="Escribe el producto que quieres buscar: \n",
+                                      fg="#0E185F", bg="#77ACF1",
+                                      font=("Dank Mono", 25, "bold"))
+        self.labelBusqueda.pack(pady=10)
+        self.busqueda = self.entryBusqueda = tk.Entry(master, font=("Cascadia Code", 20))
+        self.entryBusqueda.pack(pady=10)
+
+        self.labelMensaje = tk.Label(master, text="Escoge tu tienda favorita:",
+                                     fg="#0E185F", bg="#77ACF1",
+                                     font=("Dank Mono", 25, "bold"))
+        self.labelMensaje.pack(pady=10)
+
+
+        # Menú de opciones
+        self.menucontrol = tk.Menubutton(master, text="Opciones",
+                                         pady=10, padx=10, bg="white",
+                                         font=("Cascadia Code", 15, "bold"), fg="#241b3c")
+        self.menucontrol.pack(pady=10)
+
+        self.menuOpciones = tk.Menu(self.menucontrol, tearoff=0, fg="White", bg="#77ACF1",
+                                    font=("Cascadia Code", 15))
+        self.menuOpciones.add_command(label="Amazon", command=self.buscar_amazon)
+        self.menuOpciones.add_command(label="Mercado Libre", command=self.buscar_mercadolibre)
+        self.menuOpciones.add_command(label="Ebay", command=self.buscar_ebay)
+        self.menuOpciones.add_separator()
+        self.menuOpciones.add_command(label="Salir", command=master.destroy)
+        self.menucontrol["menu"] = self.menuOpciones
+
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        if messagebox.askokcancel("Salir", "¿Seguro que quieres salir?"):
+            self.master.destroy()
+
+    def guardar_csv(self, productos):
+        if not os.path.exists("Dataset"):
+            os.makedirs("Dataset")
+        df = pd.DataFrame(productos, columns=["Sitio", "Nombre", "Precio", "Ranking", "Fecha de entrega"])
+        df.to_csv("Dataset/productos_online.csv", index=False, mode='a',
+                  header=not os.path.exists("Dataset/productos_online.csv"))
+
+    def buscar_amazon(self):
+        busqueda = self.entryBusqueda.get()
+        if busqueda.strip() != "":
+            messagebox.showinfo("Buscando...", f"Buscando '{busqueda}' en Amazon")
+            self.amazon(2, busqueda)
+        else:
+            messagebox.showwarning("Advertencia", "Por favor escribe un producto para buscar.")
+
+    def buscar_mercadolibre(self):
+        busqueda = self.entryBusqueda.get()
+        if busqueda.strip() != "":
+            messagebox.showinfo("Buscando...", f"Buscando '{busqueda}' en Mercado Libre")
+            self.mercadolibre(2, busqueda)
+        else:
+            messagebox.showwarning("Advertencia", "Por favor escribe un producto para buscar.")
+
+    def buscar_ebay(self):
+        busqueda = self.entryBusqueda.get()
+        if busqueda.strip() != "":
+            messagebox.showinfo("Buscando...", f"Buscando '{busqueda}' en Ebay")
+            self.ebay(2, busqueda)
+        else:
+            messagebox.showwarning("Advertencia", "Por favor escribe un producto para buscar.")
+
+    def amazon(self, paginas, busqueda):
+        driver_path = ChromeDriverManager().install()
+        s = Service(driver_path)
+        opc = Options()
+        opc.add_argument('--start-maximized')
+        navegador = webdriver.Chrome(service=s, options=opc)
+        navegador.get("https://www.amazon.com.mx")
+        time.sleep(7)
+
+        txtBusqueda = navegador.find_element(By.ID, "twotabsearchtextbox")
+        txtBusqueda.send_keys(busqueda)
+        time.sleep(2)
+        btnBuscar = navegador.find_element(By.ID, "nav-search-submit-button")
+        btnBuscar.click()
+        time.sleep(4)
+
+        productos = []
+
+        if not os.path.exists("imagenes_amazon"):
+            os.makedirs("imagenes_amazon")
+
+        for pagina in range(1, paginas + 1):
+            navegador.save_screenshot(f"imagenes_amazon/{busqueda}_{pagina}.png")
+
+            soup = BeautifulSoup(navegador.page_source, "html.parser")
+            items = soup.find_all("div", {"data-component-type": "s-search-result"})
+
+            for item in items[:4]:
+                nombre = item.find("h2", class_="a-size-base-plus a-spacing-none a-color-base a-text-normal")
+                nombre = nombre.text.strip() if nombre else "No disponible"
+
+                precio = item.find("span", class_="a-price-whole")
+                precio = precio.text.strip() if precio else "No disponible"
+
+                ranking = item.find("span", class_="a-icon-alt")
+                ranking = ranking.text.strip() if ranking else "No cuenta con calificaciones"
+
+                entrega = item.find("span", class_="a-text-bold")
+                entrega = entrega.text.strip() if entrega else "No disponible"
+
+                productos.append(["Amazon", nombre, precio, ranking, entrega])
+
+            try:
+                btnSiguiente = navegador.find_element(By.LINK_TEXT, "Siguiente")
+                btnSiguiente.click()
+                time.sleep(5)
+            except:
+                break
+
+        navegador.quit()
+        self.guardar_csv(productos)
+
+    def mercadolibre(self, paginas, busqueda):
+        driver_path = ChromeDriverManager().install()
+        s = Service(driver_path)
+        opc = Options()
+        opc.add_argument('--start-maximized')
+        navegador = webdriver.Chrome(service=s, options=opc)
+        navegador.get("https://www.mercadolibre.com.mx")
+        time.sleep(7)
+
+        txtBusqueda = navegador.find_element(By.ID, "cb1-edit")
+        txtBusqueda.send_keys(busqueda)
+        time.sleep(2)
+        btnBuscar = navegador.find_element(By.CLASS_NAME, "nav-icon-search")
+        btnBuscar.click()
+        time.sleep(4)
+
+        productos = []
+
+        if not os.path.exists("imagenes_mercadolibre"):
+            os.makedirs("imagenes_mercadolibre")
+
+        for pagina in range(1, paginas + 1):
+            navegador.save_screenshot(f"imagenes_mercadolibre/{busqueda}_{paginas}.png")
+
+            soup = BeautifulSoup(navegador.page_source, "html.parser")
+            items = soup.find_all("li", class_="ui-search-layout__item")
+
+            for item in items[:4]:
+                nombre = item.find("h3", class_="poly-component__title-wrapper")
+                nombre = nombre.text.strip() if nombre else "No disponible"
+
+                precio = item.find("span", class_="andes-money-amount__fraction")
+                precio = precio.text.strip() if precio else "No disponible"
+
+                ranking = item.find("span", class_="andes-visually-hidden")
+                ranking = ranking.text.strip() if ranking else "No cuenta con calificaciones"
+
+                entrega = "Consultar sitio"
+
+                productos.append(["Mercado Libre", nombre, precio, ranking, entrega])
+
+            try:
+                btnSiguiente = navegador.find_element(By.LINK_TEXT, "Siguiente")
+                siguiente_url = btnSiguiente.get_attribute("href")
+                navegador.get(siguiente_url)
+                time.sleep(6)
+            except:
+                break
+
+        navegador.quit()
+        self.guardar_csv(productos)
+
+    def ebay(self, paginas, busqueda):
+        driver_path = ChromeDriverManager().install()
+        s = Service(driver_path)
+        opc = Options()
+        opc.add_argument('--start-maximized')
+        navegador = webdriver.Chrome(service=s, options=opc)
+        navegador.get("https://www.ebay.com/")
+        time.sleep(7)
+
+        txtBusqueda = navegador.find_element(By.ID, "gh-ac")
+        txtBusqueda.send_keys(busqueda)
+        time.sleep(2)
+        btnBuscar = navegador.find_element(By.ID, "gh-search-btn")
+        btnBuscar.click()
+        time.sleep(4)
+
+        productos = []
+
+        if not os.path.exists("imagenes_ebay"):
+            os.makedirs("imagenes_ebay")
+
+        for pagina in range(1, paginas + 1):
+            navegador.save_screenshot(f"imagenes_ebay/{busqueda}_{pagina}.png")
+
+            soup = BeautifulSoup(navegador.page_source, "html.parser")
+            items = soup.find_all("li", {"class": "s-item"})
+
+            for item in items[:4]:
+                nombre = item.find("div", class_="s-item__title")
+                nombre = nombre.text.strip() if nombre else "No disponible"
+
+                precio = item.find("span", class_="s-item__price")
+                precio = precio.text.strip() if precio else "No disponible"
+
+                ranking = item.find("span",{"class":"ebay-review-start-rating"})
+                ranking = ranking.text.strip() if ranking else "No cuenta con calificaciones"
+
+                entrega = item.find("span", class_="s-item__location s-item__itemLocation")
+                entrega = entrega.text.strip() if entrega else "No disponible"
+
+                productos.append(["Ebay", nombre, precio, ranking, entrega])
+
+            try:
+                btnSiguiente = navegador.find_element(By.CLASS_NAME, "pagination__next")
+                btnSiguiente.click()
+                time.sleep(5)
+            except:
+                break
+
+        navegador.quit()
+        self.guardar_csv(productos)
+
+        def mercadolibre(self, paginas, busqueda):
+            driver_path = ChromeDriverManager().install()
+            s = Service(driver_path)
+            opc = Options()
+            opc.add_argument('--start-maximized')
+            navegador = webdriver.Chrome(service=s, options=opc)
+            navegador.get("https://www.mercadolibre.com.mx")
+            time.sleep(7)
+
+            txtBusqueda = navegador.find_element(By.ID, "cb1-edit")
+            txtBusqueda.send_keys(busqueda)
+            time.sleep(2)
+            btnBuscar = navegador.find_element(By.CLASS_NAME, "nav-icon-search")
+            btnBuscar.click()
+            time.sleep(4)
+
+            productos = []
+
+            if not os.path.exists("imagenes_mercadolibre"):
+                os.makedirs("imagenes_mercadolibre")
+
+            for pagina in range(1, paginas + 1):
+                navegador.save_screenshot(f"imagenes_mercadolibre/{busqueda}_{paginas}.png")
+
+                soup = BeautifulSoup(navegador.page_source, "html.parser")
+                items = soup.find_all("li", class_="ui-search-layout__item")
+
+                for item in items[:4]:
+                    nombre = item.find("h3", class_="poly-component__title-wrapper")
+                    nombre = nombre.text.strip() if nombre else "No disponible"
+
+                    precio = item.find("span", class_="andes-money-amount__fraction")
+                    precio = precio.text.strip() if precio else "No disponible"
+
+                    ranking = item.find("span", class_="andes-visually-hidden")
+                    ranking = ranking.text.strip() if ranking else "No cuenta con calificaciones"
+
+                    entrega = "Consultar sitio"
+
+                    productos.append(["Mercado Libre", nombre, precio, ranking, entrega])
+
+                try:
+                    btnSiguiente = navegador.find_element(By.LINK_TEXT, "Siguiente")
+                    siguiente_url = btnSiguiente.get_attribute("href")
+                    navegador.get(siguiente_url)
+                    time.sleep(6)
+                except:
+                    break
+
+            navegador.quit()
+            self.guardar_csv(productos)
+
+        def ebay(self, paginas, busqueda):
+            driver_path = ChromeDriverManager().install()
+            s = Service(driver_path)
+            opc = Options()
+            opc.add_argument('--start-maximized')
+            navegador = webdriver.Chrome(service=s, options=opc)
+            navegador.get("https://www.ebay.com/")
+            time.sleep(7)
+
+            txtBusqueda = navegador.find_element(By.ID, "gh-ac")
+            txtBusqueda.send_keys(busqueda)
+            time.sleep(2)
+            btnBuscar = navegador.find_element(By.ID, "gh-search-btn")
+            btnBuscar.click()
+            time.sleep(4)
+
+            productos = []
+
+            if not os.path.exists("imagenes_ebay"):
+                os.makedirs("imagenes_ebay")
+
+            for pagina in range(1, paginas + 1):
+                navegador.save_screenshot(f"imagenes_ebay/{busqueda}_{pagina}.png")
+
+                soup = BeautifulSoup(navegador.page_source, "html.parser")
+                items = soup.find_all("li", {"class": "s-item"})
+
+                for item in items[:4]:
+                    nombre = item.find("div", class_="s-item__title")
+                    nombre = nombre.text.strip() if nombre else "No disponible"
+
+                    precio = item.find("span", class_="s-item__price")
+                    precio = precio.text.strip() if precio else "No disponible"
+
+                    ranking = item.find("span", {"class": "ebay-review-start-rating"})
+                    ranking = ranking.text.strip() if ranking else "No cuenta con calificaciones"
+
+                    entrega = item.find("span", class_="s-item__location s-item__itemLocation")
+                    entrega = entrega.text.strip() if entrega else "No disponible"
+
+                    productos.append(["Ebay", nombre, precio, ranking, entrega])
+
+                try:
+                    btnSiguiente = navegador.find_element(By.CLASS_NAME, "pagination__next")
+                    btnSiguiente.click()
+                    time.sleep(5)
+                except:
+                    break
+
+            navegador.quit()
+            self.guardar_csv(productos)
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = SitiosWeb(root)
+    root.mainloop()
