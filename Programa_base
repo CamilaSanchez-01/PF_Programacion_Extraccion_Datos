@@ -76,7 +76,7 @@ class SitiosWeb:
     def guardar_csv(self,productos):
         if not os.path.exists("Dataset"):
             os.makedirs("Dataset")
-        df = pd.DataFrame(productos, columns=["Sitio", "Nombre", "Precio", "Ranking", "Fecha de entrega"])# Aqui se debe cambiar
+        df = pd.DataFrame(productos, columns=["Marca", "Modelo", "Año", "Rango de Precio", "Pros", "Contra", "Descripción del carro", "Volumen_carga", "Batería", "Peso", "Eficiencia", "Kilometraje","Link"])# Aqui se debe cambiar
         df.to_csv("Dataset/carros.csv", index=False, mode='a',
                   header=not os.path.exists("Dataset/carros.csv")) # Aqui tambien
 
