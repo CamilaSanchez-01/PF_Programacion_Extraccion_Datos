@@ -1,6 +1,3 @@
-from Base_programa import SitiosWeb
-
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -9,8 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import time
 
-
-def tienda1(self, paginas, busqueda):
+def tienda1(paginas):
     driver_path = ChromeDriverManager().install()
     s = Service(driver_path)
     opc = Options()
@@ -21,51 +17,98 @@ def tienda1(self, paginas, busqueda):
 
     productos = []
 
-    # Faltaria funcion para imagenes
-
     for pagina in range(1, paginas + 1):
         soup = BeautifulSoup(navegador.page_source, "html.parser")
         items = soup.find_all("div", class_="list-item")
 
-        for item in items[:2]:
+        for item in items[:10]:
             titulo = item.find("a", class_="title")
             if titulo:
                 spans = titulo.find_all("span")
-                Marca = spans[0].text.strip()
-                Modelo = spans[1].text.strip()
-                continue
+                marca = spans[0].text.strip()
+                modelo = spans[1].text.strip()
+                Marca = marca
+                Modelo = modelo
             else:
                 Marca = "No disponible"
                 Modelo = "No diponible"
-        Rango_Precio = item.find("span", class_="priceperrange_p")
-        Rango_Precio = Rango_Precio.text.strip() if Rango_Precio else "No disponible"
 
-        Volumen_carga = item.find("span", class_="cargo")
-        Volumen_carga = Volumen_carga.text.strip() if Volumen_carga else "No disponible"
+            Precio = item.find("span", class_="country_de", style="vertical-align: inherit;")
+            Precio = Precio.text.strip() if Precio else "No disponible" # El precio esta en Euro Aleman
 
-        Batería = item.find("span", class_="battery_p")
-        Batería = Batería.text.strip() if Batería else "No disponible"
+            Precio_Rango = item.find("span", class_="priceperrange hidden") # En Euro (aleman)/ Km
+            Precio_Rango = Precio_Rango.text.strip() if Precio_Rango else "No disponible"
 
-        Peso = item.find("span", class_="weight_p")
-        Peso = Peso.text.strip() if Peso else "No disponible"
+            Rango = item.find("span", class_="erange_real")
+            Rango = Rango.text.strip() if Rango else "No disponible"
 
-        Eficiencia = item.find("span", class_="efficiency")
-        Eficiencia = Eficiencia.text.strip() if Eficiencia else "No disponible"
+            Bateria = item.find("span", class_="battery_p")
+            Bateria = Bateria.text.strip() if Bateria else "No disponible"
 
-        Kilometraje = item.find("span", class_="a-text-bold")
-        Kilometraje = Kilometraje.text.strip() if Kilometraje else "No disponible"
+            Eficiencia = item.find("span", class_="efficiency")
+            Eficiencia = Eficiencia.text.strip() if Eficiencia else "No disponible"
 
-        productos.append(
-            [Marca, Modelo, "No disponible", Rango_Precio, "No disponible", "No disponible", "No disponible",
-             Volumen_carga, Batería, Peso, Eficiencia, Kilometraje, "https://ev-database.org/"])
+            Peso = item.find("span", class_="weight_p")
+            Peso = Peso.text.strip() if Peso else "No disponible"
 
-    try:
-        btnSiguiente = navegador.find_element(By.CSS_SELECTOR, "pagination-nav-nextlast")
-        btnSiguiente.click()
-        time.sleep(5)
-    except:
-        pass
+            Remolque = item.find("span", class_="towweight hidden") # En kilos
+            Remolque = Remolque.text.strip() if Remolque else "No disponible"
 
+            Carga_Rapida = item.find("span", class_="fastcharge_speed hidden") # En kw
+            Carga_Rapida = Carga_Rapida.text.strip() if Carga_Rapida else "No disponible"
+
+            Carga_Vol = item.find("span", class_="cargosort hidden") # En L
+            Carga_Vol = Carga_Vol.text.strip() if Carga_Vol else "No disponible"
+
+            Rango_1_parada = item.find("span", class_="long_distance_total_sort hidden") # En Km
+            Rango_1_parada = Rango_1_parada.text.strip() if Rango_1_parada else "No disponible"
+
+            Traccion_trasera = item.find("span", class_="achter far fa-circle", style="margin-right: -3px;") # Es una figura, revisar
+            Traccion_trasera = Traccion_trasera.text.strip() if Traccion_trasera else "No disponible"
+
+            Traccion_delantera = item.find("span", class_="achter fas fa-circle")
+            Traccion_delantera = Traccion_delantera.text.strip() if Traccion_delantera else "No disponible"
+
+            Segmento_mercado = item.find("span", class_="size-d", style="vertical-align: inherit;")
+            Segmento_mercado = Segmento_mercado.text.strip() if Segmento_mercado else "No disponible"
+
+            Clasificacion_seguridad = item.find("span", class_="safety hidden")
+            Clasificacion_seguridad = Clasificacion_seguridad.text.strip() if Clasificacion_seguridad else "No disponible"
+
+            Numero_asientos = item.find("span", class_="seats-5 fas fa-user", style="vertical-align: inherit;")
+            Numero_asientos = Numero_asientos.text.strip() if Numero_asientos else "No disponible"
+
+            Bomba_calor = item.find("span", class_="heatpump hidden")
+            Bomba_calor = Bomba_calor.text.strip() if Bomba_calor else "No disponible"
+
+            Carga_bidireccional = item.find("span", {"data-tooltip": True, "class": "icons-row-2"})
+            Carga_bidireccional = Carga_bidireccional.text.strip() if Carga_bidireccional else "No disponible"
+
+            # Funcion de imagen
+            imagen_tag = item.find("img", {"src": True})
+            if imagen_tag:
+                imagen_srl = imagen_tag["src"]
+                imagen_Url = f"https://ev-database.org/{imagen_srl}"
+            else:
+                imagen_Url = "No disponible"
+
+            productos.append([Marca, Modelo, Precio, Precio_Rango, Rango, Bateria, Eficiencia,
+                                                    Peso, Remolque, Carga_Rapida, Carga_Vol, Rango_1_parada,
+                                                    Traccion_trasera, Traccion_delantera, Segmento_mercado,
+                                                    Clasificacion_seguridad, Numero_asientos, Bomba_calor,
+                                                    Carga_bidireccional, imagen_Url, "https://ev-database.org/"])
+
+
+
+        try:
+            btnSiguiente = navegador.find_element(By.CSS_SELECTOR, ".pagination-nav-nextlast")
+            btnSiguiente.click()
+            time.sleep(5)
+        except:
+            break
+
+    navegador.quit()
+    return productos
 
 
 
