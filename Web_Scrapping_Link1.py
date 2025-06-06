@@ -33,8 +33,30 @@ def tienda1(paginas):
                 Marca = "No disponible"
                 Modelo = "No diponible"
 
-            Precio = item.find("span", class_="country_de", style="vertical-align: inherit;")
-            Precio = Precio.text.strip() if Precio else "No disponible" # El precio esta en Euro Aleman
+            #Precio = item.find("div", class_="price_buy archive", style="vertical-align: inherit; )#cambie este VC
+
+            # Obtener todos los divs de clase 'price_buy archive'
+            precios_divs = item.find_all("div", class_="price_buy archive")
+
+            # Diccionario para guardar los precios por país
+            precios_por_pais = {
+                "Alemania (€)": "No disponible",
+                "Países Bajos (€)": "No disponible",
+                "Reino Unido (£)": "No disponible"
+            }
+
+            # Recorrer todos los divs de precio por país
+            for div in precios_divs:
+                if div.find("span", class_="country_de"):
+                    precio = div.find("span", class_="country_de").text.strip()
+                    precios_por_pais["Alemania (€)"] = precio
+                elif div.find("span", class_="country_nl"):
+                    precio = div.find("span", class_="country_nl").text.strip()
+                    precios_por_pais["Países Bajos (€)"] = precio
+                elif div.find("span", class_="country_uk"):
+                    precio = div.find("span", class_="country_uk").text.strip()
+                    precios_por_pais["Reino Unido (£)"] = precio
+
 
             Precio_Rango = item.find("span", class_="priceperrange hidden") # En Euro (aleman)/ Km
             Precio_Rango = Precio_Rango.text.strip() if Precio_Rango else "No disponible"
@@ -92,13 +114,17 @@ def tienda1(paginas):
             else:
                 imagen_Url = "No disponible"
 
-            productos.append([Marca, Modelo, Precio, Precio_Rango, Rango, Bateria, Eficiencia,
-                                                    Peso, Remolque, Carga_Rapida, Carga_Vol, Rango_1_parada,
-                                                    Traccion_trasera, Traccion_delantera, Segmento_mercado,
-                                                    Clasificacion_seguridad, Numero_asientos, Bomba_calor,
-                                                    Carga_bidireccional, imagen_Url, "https://ev-database.org/"])
-
-
+            productos.append([
+                Marca, Modelo,
+                precios_por_pais["Alemania (€)"],
+                precios_por_pais["Países Bajos (€)"],
+                precios_por_pais["Reino Unido (£)"],
+                Precio_Rango, Rango, Bateria, Eficiencia, Peso,
+                Remolque, Carga_Rapida, Carga_Vol, Rango_1_parada,
+                Traccion_trasera, Traccion_delantera, Segmento_mercado,
+                Clasificacion_seguridad, Numero_asientos, Bomba_calor,
+                Carga_bidireccional, imagen_Url, "https://ev-database.org/"
+            ])
 
         try:
             btnSiguiente = navegador.find_element(By.CSS_SELECTOR, ".pagination-nav-nextlast")
