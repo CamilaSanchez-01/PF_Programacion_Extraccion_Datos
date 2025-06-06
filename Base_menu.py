@@ -3,7 +3,7 @@ from tkinter import messagebox
 import os
 import pandas as pd
 from Web_Scrapping_Link1 import tienda1
-from Limpieza_CSV import Limpieza
+from Limpieza_CSV import limpieza1
 from Dashboards_base import dashboard_estructura
 
 
@@ -56,14 +56,19 @@ class SitiosWeb:
     def guardar_csv(self,productos):
         if not os.path.exists("Dataset"):
             os.makedirs("Dataset")
-        df = pd.DataFrame(productos, columns=["Marca", "Modelo", "Precio", "Precio_Rango", "Rango", "Bateria", "Eficiencia",
-                                                    "Peso", "Remolque", "Carga_Rapida", "Carga_Vol", "Rango_1_parada",
-                                                    "Traccion_trasera", "Traccion_delantera", "Segmento_mercado",
-                                                    "Clasificacion_seguridad", "Numero_asientos", "Bomba_calor",
-                                                    "Carga_bidireccional", "Imagen_tag", "Sitio"])
+
+        df = pd.DataFrame(productos, columns=[
+            "Marca", "Modelo",
+            "Alemania (€)", "Países Bajos (€)", "Reino Unido (£)",  # ← NUEVAS columnas
+            "Precio_Rango", "Rango", "Bateria", "Eficiencia",
+            "Peso", "Remolque", "Carga_Rapida", "Carga_Vol", "Rango_1_parada",
+            "Traccion_trasera", "Traccion_delantera", "Segmento_mercado",
+            "Clasificacion_seguridad", "Numero_asientos", "Bomba_calor",
+            "Carga_bidireccional", "Imagen_tag", "Sitio"
+        ])
+
         df.to_csv("Dataset/carros.csv", index=False, mode='a',
                   header=not os.path.exists("Dataset/carros.csv"))
-
     def buscar_tienda1(self):
         try:
             messagebox.showinfo("Buscando . . . ", f"Buscado en Tienda ")
@@ -81,7 +86,7 @@ class SitiosWeb:
 
     def opc_limpiar_datos(self):
         try:
-            Limpieza()
+            limpieza1()
             messagebox.showinfo("Informacion", "Datos limpiados correctamente")
         except Exception as e:
             messagebox.showerror("ERROR", f"Ocurrio un error al limpiar los datos:\n{str(e)}")
