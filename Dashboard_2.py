@@ -1,14 +1,12 @@
 import pandas as pd
 import plotly.express as px
 import dash_bootstrap_components as dbc
-from dash import Input, Output, callback, html, dcc, Dash
-
+from dash import Input, Output, callback, html, dcc
 """
 El codigo extrae los valores numéricos y en la parte de eficiencia, comienza a limpiar los datos.
 Diseñar, limpiar, filtrar datos
 A su vez que diseña la pagina dashboard para mostrar los KPIs
 """
-
 def clean_numeric(value):
 
     if pd.isna(value) or value == "No disponible":
@@ -228,8 +226,3 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
             "N/A", "N/A", "N/A", "N/A",
             empty_fig, empty_fig, empty_fig
         )
-# Ejecutamos la app
-if __name__ == "__main__":
-    app = Dash(__name__)
-    app.layout = eficiencia()
-    app.run(debug=True)
