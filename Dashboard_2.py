@@ -2,8 +2,6 @@ import pandas as pd
 import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback, html, dcc
-#hola
-
 """
 El codigo extrae los valores numéricos y en la parte de eficiencia, comienza a limpiar los datos.
 Diseñar, limpiar, filtrar datos
