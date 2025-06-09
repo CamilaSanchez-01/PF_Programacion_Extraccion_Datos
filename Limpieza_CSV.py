@@ -34,12 +34,27 @@ def limpieza1():
         else:
             print(f"Columna '{columna}' no encontrada en el archivo CSV.")
 
+    df.rename(columns={
+        "Rango": "Rango(Km)",
+        "Eficiencia": "Eficiencia(Wh/km)",
+        "Bateria": "Bateria(kWh)",
+        "Peso": "Peso(kg)"
+    }, inplace=True)
+
+    df["Rango(Km)"] = df["Rango(Km)"].str.replace("km", "", regex=False).astype(float)
+
+    df["Eficiencia(Wh/km)"] = df["Eficiencia(Wh/km)"].str.replace("Wh/km", "", regex=False).astype(float)
+
+    df["Bateria(kWh)"] = df["Bateria(kWh)"].str.replace("kWh", "", regex=False).astype(float)
+
+    df["Peso(kg)"] = df["Peso(kg)"].str.replace("kg", "", regex=False).astype(float)
+
     # 3. Reordenar columnas
     columnas_orden = [
         "Marca", "Modelo",
         "Alemania (USD)", "Países Bajos (USD)", "Reino Unido (USD)",
-        "Precio_Rango", "Rango", "Bateria", "Eficiencia",
-        "Peso", "Remolque", "Carga_Rapida", "Carga_Vol", "Rango_1_parada",
+        "Precio_Rango", "Rango(Km)", "Bateria(kWh)", "Eficiencia(Wh/km)",
+        "Peso(kg)", "Remolque", "Carga_Rapida", "Carga_Vol", "Rango_1_parada",
         "Traccion_trasera", "Traccion_delantera", "Segmento_mercado",
         "Clasificacion_seguridad", "Numero_asientos", "Bomba_calor",
         "Carga_bidireccional", "Imagen_tag", "Sitio"

@@ -1,3 +1,4 @@
+import app
 import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html, callback, Dash
@@ -6,17 +7,16 @@ from Dashboard_2 import eficiencia
 from Dashboard_3 import distribucion_precios
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
-app.title = "Dashboard Autos Eléctricos"
+
 
 SIDEBAR_STYLE = {
     "position": "fixed",
     "top": 0,
     "left": 0,
     "bottom": 0,
-    "width": "16rem",
+    "width": "19rem",
     "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
+    "background-color": "black",
 }
 
 CONTENT_STYLE = {
@@ -43,16 +43,10 @@ sidebar = html.Div(
                 pills=True,
             ),
         ],
-        className="SIDEBAR_STYLE",
+        style= SIDEBAR_STYLE,
     )
 
-content = html.Div(id="page-content", className="CONTENT_STYLE")
-
-app.layout = html.Div([
-    dcc.Location(id="url"),
-    sidebar,
-    content
-])
+content = html.Div(id="page-content", style=CONTENT_STYLE)
 
 @callback(Output("page-content", "children"),
               [Input("url", "pathname")])
@@ -61,11 +55,11 @@ def dashboard_estructura(pathname):
     if pathname == "/":
         return eficiencia()
     elif pathname == "/dash1":
-        return distribucion_precios()
+        return carga_rapida()
     elif pathname == "/dash2":
         return eficiencia()
     elif pathname == "/dash3":
-        return carga_rapida()
+        return distribucion_precios()
     # If the user tries to reach a different page, return a 404 message
     return html.Div(
         [
@@ -77,6 +71,9 @@ def dashboard_estructura(pathname):
     )
 
 if __name__ == "__main__":
+    app.title = "Dashboard Autos Eléctricos"
+    app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG],
+               suppress_callback_exceptions=True)
     app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
     app.run(debug=True)
 

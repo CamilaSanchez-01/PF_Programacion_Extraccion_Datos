@@ -5,7 +5,6 @@ from dash import Dash, Input, Output, callback, html, dcc
 
 def carga_rapida():
     df = pd.read_csv("Dataset/carros_limpio.csv")
-    df["Bateria"] = df["Bateria"].str.replace("kWh","",regex=False).astype(float)
 
     body = dbc.Container([
         html.H2("Carga Rápida 🔌 "),
@@ -54,10 +53,10 @@ def carga_rapida():
                 dcc.Graph(id="barras-menor", style={"height": "400px"}), md=6
             ),
             dbc.Col(
-                dcc.Graph(id="barras-rendi", style={"height": "400px"}), md=6
+                dcc.Graph(id="barras-rendi", style={"height": "400px"}), md=12
             ),
             dbc.Col(
-                dcc.Graph(id="barras-carga", style={"height": "400px"}), md=6
+                dcc.Graph(id="barras-carga", style={"height": "400px"}), md=12
             )
 
         ])
@@ -78,14 +77,13 @@ def carga_rapida():
 def figuras(Marca):
     df = pd.read_csv("Dataset/carros_limpio.csv")
 
-    df["Bateria"] = df["Bateria"].str.replace("kWh","",regex=False).astype(float)
     if Marca:
         df_marca = df[df.Marca == Marca]
     else:
         df_marca = df
 
     kpi_carga = f"{df_marca['Carga_Rapida'].mean():2f} KW"
-    kpi_bateria = f"{df_marca['Bateria'].mean():2f} KW"
+    kpi_bateria = f"{df_marca['Bateria(kWh)'].mean():2f} KW"
     kpi_auto = df_marca.sort_values(by = "Carga_Rapida",ascending=False).iloc[0]["Modelo"]
     top_mayor  = df_marca.sort_values(by="Carga_Rapida", ascending=False).head(5)
     top_menor = df_marca.sort_values(by="Carga_Rapida", ascending=False).tail(5)
@@ -103,7 +101,7 @@ def figuras(Marca):
 
     fig_menor.update_layout(xaxis=dict(showticklabels=False))
 
-    fig_rendi = px.scatter(df_marca, x= "Carga_Vol", y= "Bateria", color= "Carga_Rapida",template="plotly_dark",title="🗺️🌍Mapa de Rendimiento en Carga Rápida",
+    fig_rendi = px.scatter(df_marca, x= "Carga_Vol", y= "Bateria(kWh)", color= "Carga_Rapida",template="plotly_dark",title="🗺️🌍Mapa de Rendimiento en Carga Rápida",
                            hover_name="Modelo",size="Carga_Rapida",labels={"Carga_Vol": "Tamaño total de carga  (Kwh)"})
 
 

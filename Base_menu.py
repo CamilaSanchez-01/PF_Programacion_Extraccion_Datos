@@ -29,7 +29,7 @@ class SitiosWeb:
         self.master.config()
 
         # Aqui se hace uso de PIL
-        gif_p = "carro.gif"
+        gif_p = "assets/imagenes/carro.gif"
         self.frames = []
         gif = Image.open(gif_p)
 
