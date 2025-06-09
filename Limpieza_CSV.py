@@ -1,7 +1,6 @@
 import pandas as pd
 from Web_Scrapping_Link1 import tienda1
 
-
 def limpieza1():
     # Cargar el archivo CSV
     df = pd.read_csv("Dataset/carros.csv", sep=",")
