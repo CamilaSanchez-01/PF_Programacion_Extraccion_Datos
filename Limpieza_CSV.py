@@ -33,7 +33,8 @@ def limpieza1():
             df.drop([columna, columna + "_num"], axis=1, inplace=True)
         else:
             print(f"Columna '{columna}' no encontrada en el archivo CSV.")
-
+            
+#Renombre de columnas y tipos de datos por problemas de formato
     df.rename(columns={
         "Rango": "Rango(Km)",
         "Eficiencia": "Eficiencia(Wh/km)",
