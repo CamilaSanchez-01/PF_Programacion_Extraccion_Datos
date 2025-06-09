@@ -140,6 +140,7 @@ class SitiosWeb:
         try:
             dashboard_estructura()
         except Exception as e:
+            print(e)
             messagebox.showerror("ERROR", f"Ocurrio un error al abrir el dashboard:\n{str(e)}")
 
     # Aqui se hace uso de la animacion del gif, para que este funcione
