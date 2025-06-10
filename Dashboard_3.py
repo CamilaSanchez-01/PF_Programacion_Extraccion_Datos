@@ -119,21 +119,21 @@ def distribucion_precios():
         dbc.Row([
             dbc.Col(dbc.Card([
                 dbc.CardBody([
-                    html.H6("Precio Promedio (USD)", className="card-title"),
+                    html.H6("💵 Precio Promedio (USD)", className="card-title"),
                     html.H4(id="kpi_precio", className="card-text")
                 ])
             ], style=styles["card"]), md=4),
 
             dbc.Col(dbc.Card([
                 dbc.CardBody([
-                    html.H6("Años Analizados", className="card-title"),
+                    html.H6("🏁 Años Analizados", className="card-title"),
                     html.H4(id="kpi_anios", className="card-text")
                 ])
             ], style=styles["card"]), md=4),
 
             dbc.Col(dbc.Card([
                 dbc.CardBody([
-                    html.H6("Segmentos Detectados", className="card-title"),
+                    html.H6("🚗 Segmentos Detectados", className="card-title"),
                     html.H4(id="kpi_segmentos", className="card-text")
                 ])
             ], style=styles["card"]), md=4),
@@ -194,7 +194,7 @@ def figuras(marca, autonomia):
         y="Alemania (USD)",
         color="Marca",
         template="plotly_dark",
-        title="Relación Precio vs Eficiencia",
+        title="💵🏁 Relación Precio vs Eficiencia",labels={"Alemania (USD)": "Precio" },
         hover_data=["Modelo", "Rango(Km)", "Segmento_mercado"]
     ) if not df_filtrado.empty else {}
 
@@ -202,9 +202,9 @@ def figuras(marca, autonomia):
     fig2 = px.histogram(
         df_filtrado,
         x="Alemania (USD)",
-        nbins=20,
-        template="plotly_dark",
-        title="Distribución de Precios"
+        nbins=20,color="Marca",
+        template="plotly_dark",labels={"Alemania (USD)": "Precio" },
+        title="⚖️💸 Distribución de Precios"
     ) if not df_filtrado.empty else {}
 
     # Barra para ver cómo cambia el precio promedio por año
@@ -213,8 +213,8 @@ def figuras(marca, autonomia):
         df_agrupado,
         x="año",
         y="Alemania (USD)",
-        template="plotly_dark",
-        title="Precio Promedio por Año"
+        template="plotly_dark",labels={"Alemania (USD)": "Precio" },
+        title="➕💵 Precio Promedio por Año"
     ) if not df_filtrado.empty else {}
 
     # Regresamos
