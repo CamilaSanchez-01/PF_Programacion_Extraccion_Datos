@@ -2,35 +2,72 @@ import pandas as pd
 import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback, html, dcc
-"""
-El codigo extrae los valores numéricos y en la parte de eficiencia, comienza a limpiar los datos.
-Diseñar, limpiar, filtrar datos
-A su vez que diseña la pagina dashboard para mostrar los KPIs
-"""
+
+# Colores y estilos para que la app se vea cool y moderna
+colors = {
+    "background": "#0A0F24",
+    "primary": "#00BFFF",
+    "secondary": "#1E90FF",
+    "accent": "#8A2BE2",
+    "text_light": "#F0F8FF",
+    "card_bg": "#11182F",
+    "shadow": "0 0 18px #00BFFF"
+}
+
+styles = {
+    "header": {
+        "fontFamily": "'Orbitron', sans-serif",
+        "color": colors["primary"],
+        "fontSize": "2.5rem",
+        "textAlign": "center",
+        "marginBottom": "1rem",
+        "textShadow": "0 0 15px #00BFFF",
+        "letterSpacing": "1.5px"
+    },
+    "card": {
+        "backgroundColor": colors["card_bg"],
+        "borderRadius": "15px",
+        "boxShadow": colors["shadow"],
+        "padding": "20px",
+        "marginBottom": "1.5rem",
+        "color": colors["text_light"],
+        "fontSize": "1.1rem",
+        "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "label": {
+        "color": colors["primary"],
+        "fontWeight": "600",
+        "fontFamily": "'Orbitron', sans-serif",
+        "fontSize": "1.1rem"
+    },
+    "dropdown": {
+        "backgroundColor": "#11182F",
+        "color": colors["text_light"],
+        "borderRadius": "8px",
+        "boxShadow": "0 0 12px #00BFFF"
+    }
+}
+
 def eficiencia():
+    # Aquí leemos el archivo con la info de los carros y limpiamos datos faltantes
     try:
         df = pd.read_csv("Dataset/carros_limpio.csv")
-
         df = df.dropna(subset=['Eficiencia(Wh/km)', 'Peso(kg)'])
-
-        marcas = sorted(df['Marca'].dropna().unique())
-
+        marcas = sorted(df['Marca'].dropna().unique())  # Sacamos la lista de marcas que hay
     except Exception as e:
         print(f"Error al cargar datos: {e}")
         marcas = []
         df = pd.DataFrame()
 
-
+    # Este es el diseño de la página donde mostramos todo
     return dbc.Container([
-        html.H1("Análisis de Eficiencia Energética", className="text-center my-4"),
-
+        html.H1("Análisis de Eficiencia Energética", style=styles["header"]),
 
         dbc.Card([
-            dbc.CardHeader("Filtros", className="bg-dark text-white"),
             dbc.CardBody([
                 dbc.Row([
                     dbc.Col([
-                        dbc.Label("Rango de Eficiencia (Wh/km):"),
+                        html.Label("Rango de Eficiencia (Wh/km):", style=styles["label"]),
                         dcc.RangeSlider(
                             id='eficiencia-slider',
                             min=100 if df.empty else int(df['Eficiencia(Wh/km)'].min()),
@@ -45,52 +82,49 @@ def eficiencia():
                         )
                     ], md=8),
                     dbc.Col([
-                        dbc.Label("Marca:"),
+                        html.Label("Marca:", style=styles["label"]),
                         dcc.Dropdown(
                             id='marca-filter',
                             options=[{'label': marca, 'value': marca} for marca in marcas],
                             multi=True,
-                            placeholder="Todas las marcas"
+                            placeholder="Todas las marcas",
+                            style=styles["dropdown"]
                         )
                     ], md=4)
                 ])
             ])
-        ], className="mb-4 shadow"),
+        ], style=styles["card"]),
 
-        # KPIs
         dbc.Row([
             dbc.Col(
                 dbc.Card([
-                    dbc.CardHeader("Eficiencia Promedio", className="bg-primary text-white"),
                     dbc.CardBody([
-                        html.H4(id='kpi-eficiencia-promedio', className="card-title"),
-                        html.P("Wh/km", className="card-text")
+                        html.H4("Eficiencia Promedio", style=styles["label"]),
+                        html.H2(id='kpi-eficiencia-promedio', style=styles["header"])
                     ])
-                ], className="h-100 shadow"),
+                ], style=styles["card"]),
                 md=4
             ),
             dbc.Col(
                 dbc.Card([
-                    dbc.CardHeader("Vehículo Más Eficiente", className="bg-success text-white"),
                     dbc.CardBody([
-                        html.H4(id='kpi-modelo-eficiente', className="card-title"),
-                        html.P(id='kpi-valor-eficiente', className="card-text")
+                        html.H4("Vehículo Más Eficiente", style=styles["label"]),
+                        html.H5(id='kpi-modelo-eficiente', style={"color": colors["text_light"]}),
+                        html.P(id='kpi-valor-eficiente', style={"color": colors["primary"]})
                     ])
-                ], className="h-100 shadow"),
+                ], style=styles["card"]),
                 md=4
             ),
             dbc.Col(
                 dbc.Card([
-                    dbc.CardHeader("Relación Peso-Eficiencia", className="bg-info text-white"),
                     dbc.CardBody([
-                        html.H4(id='kpi-correlacion', className="card-title"),
-                        html.P("Coeficiente de correlación", className="card-text")
+                        html.H4("Relación Peso-Eficiencia", style=styles["label"]),
+                        html.H2(id='kpi-correlacion', style=styles["header"])
                     ])
-                ], className="h-100 shadow"),
+                ], style=styles["card"]),
                 md=4
             )
-        ], className="mb-4"),
-
+        ]),
 
         dbc.Row([
             dbc.Col(
@@ -101,8 +135,7 @@ def eficiencia():
                 dcc.Graph(id='scatter-eficiencia-rango'),
                 md=6
             )
-        ], className="mb-4"),
-
+        ]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(id='histograma-eficiencia'),
@@ -110,7 +143,6 @@ def eficiencia():
             )
         ])
     ], fluid=True)
-
 
 @callback(
     [Output('kpi-eficiencia-promedio', 'children'),
@@ -124,41 +156,39 @@ def eficiencia():
      Input('marca-filter', 'value')]
 )
 def update_dashboard(eficiencia_range, marcas_seleccionadas):
+    # Esta función se encarga de actualizar todo cuando cambias filtros
     try:
-        df = pd.read_csv("Dataset/carros_limpio.csv")
+        df = pd.read_csv("Dataset/carros_limpio.csv")  # Leemos la info otra vez
+        df = df.dropna(subset=['Eficiencia(Wh/km)', 'Peso(kg)'])  # Quitamos datos incompletos
 
-        df = df.dropna(subset=['Eficiencia(Wh/km)', 'Peso(kg)'])
-
+        # Filtramos según rango y marcas que elegiste
         mask = (df['Eficiencia(Wh/km)'] >= eficiencia_range[0]) & (df['Eficiencia(Wh/km)'] <= eficiencia_range[1])
-
         if marcas_seleccionadas:
             mask &= df['Marca'].isin(marcas_seleccionadas)
-
         df_filtered = df[mask].copy()
 
+        # Si no queda nada, avisamos
         if df_filtered.empty:
             raise ValueError("No hay datos con los filtros seleccionados")
 
+        # Calculamos los números que mostramos arriba (KPIs)
         eficiencia_promedio = f"{df_filtered['Eficiencia(Wh/km)'].mean():.1f}"
-
         idx_min = df_filtered['Eficiencia(Wh/km)'].idxmin()
         modelo_eficiente = f"{df_filtered.loc[idx_min, 'Marca']} {df_filtered.loc[idx_min, 'Modelo']}"
         valor_eficiente = f"{df_filtered.loc[idx_min, 'Eficiencia(Wh/km)']:.1f} Wh/km"
-
         correlacion = f"{df_filtered['Eficiencia(Wh/km)'].corr(df_filtered['Peso(kg)']):.2f}"
 
+        # Gráficos bonitos para mostrar info visualmente
         fig_scatter_peso = px.scatter(
             df_filtered,
             x='Peso(kg)',
             y='Eficiencia(Wh/km)',
             color='Marca',
-            hover_name='Modelo', template="plotly_dark",
+            hover_name='Modelo',
+            template="plotly_dark",
             hover_data=['Rango(Km)', 'Bateria(kWh)'],
-            labels={
-                'Peso(kg)': 'Peso (kg)',
-                'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)'
-            },
-            title='Relación Peso vs Eficiencia'
+            labels={'Peso(kg)': 'Peso (kg)', 'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)'},
+            title='Peso vs Eficiencia'
         )
 
         fig_scatter_rango = px.scatter(
@@ -167,24 +197,23 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
             y='Eficiencia(Wh/km)',
             color='Marca',
             size='Bateria(kWh)',
-            hover_name='Modelo', template="plotly_dark",
-            labels={
-                'Rango(Km)': 'Rango (km)',
-                'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)',
-                'Bateria(kWh)': 'Capacidad Batería (kWh)'
-            },
-            title='Relación Rango vs Eficiencia'
+            hover_name='Modelo',
+            template="plotly_dark",
+            labels={'Rango(Km)': 'Rango (km)', 'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)', 'Bateria(kWh)': 'Batería (kWh)'},
+            title='Rango vs Eficiencia'
         )
 
         fig_hist = px.histogram(
             df_filtered,
             x='Eficiencia(Wh/km)',
             nbins=15,
-            color='Marca', template="plotly_dark",
+            color='Marca',
+            template="plotly_dark",
             labels={'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)'},
-            title='Distribución de Eficiencia Energética'
+            title='Distribución de Eficiencia'
         )
 
+        # Aquí regresamos todo para que se actualice en la página
         return (
             eficiencia_promedio,
             modelo_eficiente,
@@ -196,6 +225,7 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
         )
 
     except Exception as e:
+        # Si algo falla, mandamos mensajes vacíos y mostramos que no hay datos
         print(f"Error: {e}")
         empty_fig = px.scatter(title="No hay datos disponibles")
         return (
