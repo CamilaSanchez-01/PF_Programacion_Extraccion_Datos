@@ -189,7 +189,7 @@ def figuras(Marca):
         color="Marca",
         template="plotly_dark",
         title="🚏 Modelos con Mejor Rendimiento por Carga Parcial",
-        labels={"Rango_1_parada": "Rendimiento por parada (km)"}
+        labels={"Rango_1_parada": "Rendimiento por Parada (km)"}
     )
 
     return kpi_carga, kpi_bateria, kpi_auto, fig_mayor, fig_menor, fig_rendi, fig_carga
