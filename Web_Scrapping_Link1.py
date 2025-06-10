@@ -17,7 +17,9 @@ def tienda1(paginas):
 
     productos = []
 
-    for pagina in range(1, paginas + 1):
+    pagina_actual = 1
+
+    while pagina_actual <= paginas:
         soup = BeautifulSoup(navegador.page_source, "html.parser")
         items = soup.find_all("div", class_="list-item")
 
@@ -127,9 +129,10 @@ def tienda1(paginas):
             ])
 
         try:
-            btnSiguiente = navegador.find_element(By.CSS_SELECTOR, ".pagination-nav-nextlast")
+            btnSiguiente = navegador.find_element(By.CSS_SELECTOR, 'button[data-type="next"]')
             btnSiguiente.click()
             time.sleep(5)
+            pagina_actual += 1
         except:
             break
 
