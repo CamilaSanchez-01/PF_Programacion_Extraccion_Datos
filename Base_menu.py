@@ -103,7 +103,7 @@ class SitiosWeb:
     def buscar_tienda1(self):
         try:
             messagebox.showinfo("Buscando . . . ", f"Buscado en Tienda ")
-            productos = tienda1(1)
+            productos = tienda1(32) #<-- Aqui se ajusta la cantidad de datos 300
             if productos:
                 self.guardar_csv(productos)
                 messagebox.showinfo("EXITO","Datos guardados correctamente")
@@ -117,7 +117,7 @@ class SitiosWeb:
             dbConexion = connect(
                 host="localhost",
                 user="root",
-                password="123456789",
+                password="12345678",
                 database="ev_db"
             )
             messagebox.showinfo("Informacion", "Conexion exitosa !!")
