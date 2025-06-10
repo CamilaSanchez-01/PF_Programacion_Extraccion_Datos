@@ -29,7 +29,7 @@ sidebar = html.Div(
         [
             html.H2("EV", className="display-4"),
             html.Hr(),
-            html.P("Objetivo: Facilitar el análisis técnico y comercial de autos eléctricos en el mercado europeo, "
+            html.P("Objetivo:Facilitar el análisis técnico y comercial de autos eléctricos en el mercado europeo, "
                    "apoyando la toma de decisiones para usuarios, analistas o potenciales compradores", className="lead"),
             dbc.Nav(
                 [
