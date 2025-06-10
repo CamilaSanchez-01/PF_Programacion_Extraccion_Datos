@@ -42,7 +42,7 @@ styles = {
     },
     "dropdown": {
         "backgroundColor": "#11182F",
-        "color": colors["text_light"],
+        "color": "#1E3A8A",
         "borderRadius": "8px",
         "boxShadow": "0 0 12px #00BFFF"
     },
