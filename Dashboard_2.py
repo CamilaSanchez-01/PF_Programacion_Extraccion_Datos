@@ -99,7 +99,7 @@ def eficiencia():
             dbc.Col(
                 dbc.Card([
                     dbc.CardBody([
-                        html.H4("Eficiencia Promedio", style=styles["label"]),
+                        html.H4("➕ Eficiencia Promedio", style=styles["label"]),
                         html.H2(id='kpi-eficiencia-promedio', style=styles["header"])
                     ])
                 ], style=styles["card"]),
@@ -108,7 +108,7 @@ def eficiencia():
             dbc.Col(
                 dbc.Card([
                     dbc.CardBody([
-                        html.H4("Vehículo Más Eficiente", style=styles["label"]),
+                        html.H4(" 🚗 Vehículo Más Eficiente", style=styles["label"]),
                         html.H5(id='kpi-modelo-eficiente', style={"color": colors["text_light"]}),
                         html.P(id='kpi-valor-eficiente', style={"color": colors["primary"]})
                     ])
@@ -118,7 +118,7 @@ def eficiencia():
             dbc.Col(
                 dbc.Card([
                     dbc.CardBody([
-                        html.H4("Relación Peso-Eficiencia", style=styles["label"]),
+                        html.H4("⚖️ Relación Peso-Eficiencia", style=styles["label"]),
                         html.H2(id='kpi-correlacion', style=styles["header"])
                     ])
                 ], style=styles["card"]),
@@ -188,7 +188,7 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
             template="plotly_dark",
             hover_data=['Rango(Km)', 'Bateria(kWh)'],
             labels={'Peso(kg)': 'Peso (kg)', 'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)'},
-            title='Peso vs Eficiencia'
+            title=' ⚖️ Peso vs Eficiencia'
         )
 
         fig_scatter_rango = px.scatter(
@@ -200,7 +200,7 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
             hover_name='Modelo',
             template="plotly_dark",
             labels={'Rango(Km)': 'Rango (km)', 'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)', 'Bateria(kWh)': 'Batería (kWh)'},
-            title='Rango vs Eficiencia'
+            title='🏁 Rango vs Eficiencia'
         )
 
         fig_hist = px.histogram(
@@ -210,7 +210,7 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
             color='Marca',
             template="plotly_dark",
             labels={'Eficiencia(Wh/km)': 'Eficiencia (Wh/km)'},
-            title='Distribución de Eficiencia'
+            title='🚙 Distribución de Eficiencia'
         )
 
         # Aquí regresamos todo para que se actualice en la página
@@ -225,7 +225,7 @@ def update_dashboard(eficiencia_range, marcas_seleccionadas):
         )
 
     except Exception as e:
-        # Si algo falla, mandamos mensajes vacíos y mostramos que no hay datos
+        # Si algo falta, mandamos mensajes vacíos y mostramos que no hay datos
         print(f"Error: {e}")
         empty_fig = px.scatter(title="No hay datos disponibles")
         return (
