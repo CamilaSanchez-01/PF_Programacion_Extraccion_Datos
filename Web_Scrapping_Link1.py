@@ -140,4 +140,3 @@ def tienda1(paginas):
     return productos
 
 
-
