@@ -133,7 +133,7 @@ def figuras(Marca):
     if Marca:
         df_marca = df[df.Marca == Marca]
     else:
-        df_marca = df
+        df_marca = df.copy()
 
     # Calculo de indicadores principales
     kpi_carga = f"{df_marca['Carga_Rapida'].mean():.2f} kW"
@@ -142,14 +142,14 @@ def figuras(Marca):
 
     # Top 5 autos con mayor y menor carga rapida
     top_mayor = df_marca.sort_values(by="Carga_Rapida", ascending=False).head(5)
-    top_menor = df_marca.sort_values(by="Carga_Rapida").tail(5)
+    top_menor = df_marca.sort_values(by="Carga_Rapida",ascending=True).head(5)
 
     # Graficos de barras para top autos con mayor carga rapida
     fig_mayor = px.bar(
         top_mayor,
         x="Modelo",
         y="Carga_Rapida",
-        color="Modelo",
+        color="Modelo",hover_name="Marca",
         title="🔋 Top 5 Autos con Mayor Capacidad de Carga (kW)",
         template="plotly_dark",
         color_discrete_sequence=[colors["primary"], colors["secondary"], colors["accent"], "#8A2BE2", "#00BFFF"]
@@ -161,7 +161,7 @@ def figuras(Marca):
         top_menor,
         x="Modelo",
         y="Carga_Rapida",
-        color="Modelo",
+        color="Modelo",hover_name="Marca",
         title="🪫Top 5 Autos con Menor Capacidad de Carga (kW)",
         template="plotly_dark",
         color_discrete_sequence=[colors["accent"], colors["secondary"], colors["primary"], "#1E90FF", "#8A2BE2"]
