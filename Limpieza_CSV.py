@@ -42,13 +42,17 @@ def limpieza1():
         "Peso": "Peso(kg)"
     }, inplace=True)
 
-    df["Rango(Km)"] = df["Rango(Km)"].str.replace("km", "", regex=False).astype(float)
+    df["Rango(Km)"] = df["Rango(Km)"].str.replace("km", "", regex=False)
+    df["Rango(Km)"] = pd.to_numeric(df["Rango(Km)"], errors="coerce")
 
-    df["Eficiencia(Wh/km)"] = df["Eficiencia(Wh/km)"].str.replace("Wh/km", "", regex=False).astype(float)
+    df["Eficiencia(Wh/km)"] = df["Eficiencia(Wh/km)"].str.replace("Wh/km", "", regex=False)
+    df["Eficiencia(Wh/km)"] = pd.to_numeric(df["Eficiencia(Wh/km)"], errors="coerce")
 
-    df["Bateria(kWh)"] = df["Bateria(kWh)"].str.replace("kWh", "", regex=False).astype(float)
+    df["Bateria(kWh)"] = df["Bateria(kWh)"].str.replace("kWh", "", regex=False)
+    df["Bateria(kWh)"] = pd.to_numeric(df["Bateria(kWh)"], errors="coerce")
 
-    df["Peso(kg)"] = df["Peso(kg)"].str.replace("kg", "", regex=False).astype(float)
+    df["Peso(kg)"] = df["Peso(kg)"].str.replace("kg", "", regex=False)
+    df["Peso(kg)"] = pd.to_numeric(df["Peso(kg)"], errors="coerce")
 
     # 3. Reordenar columnas
     columnas_orden = [
