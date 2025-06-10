@@ -18,7 +18,7 @@ colors = {
     "shadow": "0 0 18px #00BFFF"
 }
 
-# Aquí están los estilos que vamos a usar en toda la app para que consistente
+# Estilos reutilizables
 styles = {
     "header": {
         "fontFamily": "'Orbitron', sans-serif",
@@ -92,7 +92,7 @@ styles = {
         "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "overflowY": "auto"
     },
-    "image": {  # Imagen tipo banner con estilo para que se vea cool
+    "image": {
         "width": "100%",
         "height": "250px",
         "objectFit": "cover",
@@ -101,7 +101,7 @@ styles = {
         "marginBottom": "2rem",
         "cursor": "pointer"
     },
-    "logo_pequeño": {  # Logo pequeño para el sidebar, que se vea limpio y con estilo
+    "logo_pequeño": {
         "width": "200px",
         "height": "200px",
         "margin": "0 auto 1rem auto",
@@ -111,6 +111,7 @@ styles = {
     }
 }
 
+# Home tab
 home_tab = html.Div([
     html.Img(
         src="assets/imagenes/carro.png",
@@ -122,54 +123,33 @@ home_tab = html.Div([
     html.H1("Proyecto Final: Explorando Datos de Autos Eléctricos", style=styles["header"]),
     html.H3("Impulsando la movilidad sostenible con datos reales", style=styles["subheader"]),
     html.Div([
-        html.Div("Hoy en día, los autos eléctricos son el futuro, y tener buena data nos ayuda a entender mejor precios, eficiencia y carga rápida.", style=styles["card"]),
-        html.H4("Qué buscamos", style={"color": colors["primary"], "fontWeight": "700", "marginBottom": "1rem"}),
+        html.Div("El mercado de autos eléctricos está creciendo rápidamente, con distintas marcas, modelos y características. "
+                 "Sin embargo, los usuarios comunes no tienen acceso centralizado y claro a datos comparativos "
+                 "como precios internacionales, autonomía, eficiencia energética o capacidades de carga..", style=styles["card"]),
+        html.H4("Objetivos:  ", style={"color": colors["primary"], "fontWeight": "700", "marginBottom": "1rem"}),
         html.Ul([
-            html.Li("Juntar datos frescos y detallados del mercado europeo de autos eléctricos.", style=styles["list_item"]),
-            html.Li("Mostrar cómo es la eficiencia energética y las opciones de carga rápida.", style=styles["list_item"]),
-            html.Li("Ayudar a compradores y fabricantes a tomar mejores decisiones.", style=styles["list_item"])
+            html.Li("¿Cuál es el rango de precios de autos eléctricos?", style=styles["list_item"]),
+            html.Li("¿Qué modelos tienen la mejor eficiencia energética?", style=styles["list_item"]),
+            html.Li("¿Qué autos ofrecen mejores capacidades de carga rápida?", style=styles["list_item"])
         ]),
         html.Hr(style={"borderColor": colors["primary"], "marginTop": "2rem", "marginBottom": "2rem"}),
-        html.P("Equipo: Cuevas Cortes Viridiana, Garnica Mendoza Jesús Alexis, Monge Núñez Jackeline, Saavedra Palacios Ana Fernanda, Sánchez Parra Camila.", style=styles["card"]),
+        html.P("Equipo: Cuevas Cortes Viridiana, Garnica Mendoza Jesús Alexis,"
+               " Monge Núñez Jackeline, Saavedra Palacios Ana Fernanda, Sánchez Parra Camila.", style=styles["card"]),
         html.P("Profesor: Josué Miguel Flores Parra", style=styles["card"]),
     ], style={"maxWidth": "850px", "margin": "auto"})
 ])
 
-tabs_content = {
-    "/": home_tab,
-    "/dash1": carga_rapida(),
-    "/dash2": eficiencia(),
-    "/dash3": distribucion_precios(),
-    "/conclusiones": html.Div([
-        html.H2("Conclusiones Clave", style=styles["header"]),
-        html.Div([
-            html.P("• Usamos Selenium y BeautifulSoup para agarrar datos reales del mercado europeo.", style=styles["card"]),
-            html.P("• Los dashboards muestran precios, eficiencia y carga rápida de varios modelos.", style=styles["card"]),
-            html.P("• Aprendimos a programar, analizar datos y a trabajar en equipo.", style=styles["card"])
-        ], style={"maxWidth": "850px", "margin": "auto"})
-    ]),
-    "/referencias": html.Div([
-        html.H2("Referencias y Repositorio GitHub", style=styles["header"]),
-        html.Ul([
-            html.Li(html.A("EV Database", href="https://ev-database.org", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
-            html.Li(html.A("BeautifulSoup", href="https://www.crummy.com/software/BeautifulSoup/", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
-            html.Li(html.A("Selenium", href="https://www.selenium.dev/", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
-            html.Li(html.A("Pandas", href="https://pandas.pydata.org/", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
-            html.Li(html.A("GitHub Repo", href="https://github.com/CamilaSanchez-01/PF_Programacion_Extraccion_Datos", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"])
-        ], style=styles["card"])
-    ], style={"maxWidth": "850px", "margin": "auto"})
-}
-
+# Sidebar
 sidebar = html.Div([
     html.Img(src="assets/imagenes/Cima-informaticos.png", style=styles["logo_pequeño"]),
-    html.H1("⚡ EV Data", style=styles["sidebar_title"]),
+    html.H1("\u26a1 EV Data", style=styles["sidebar_title"]),
     dbc.Nav([
-        dbc.NavLink("Inicio 🏠", href="/", active="exact", style=styles["nav_link"]),
-        dbc.NavLink("Carga Rápida ⚡", href="/dash1", active="exact", style=styles["nav_link"]),
-        dbc.NavLink("Eficiencia 🔋", href="/dash2", active="exact", style=styles["nav_link"]),
-        dbc.NavLink("Precios 💸", href="/dash3", active="exact", style=styles["nav_link"]),
-        dbc.NavLink("Conclusiones 🔐", href="/conclusiones", active="exact", style=styles["nav_link"]),
-        dbc.NavLink("Referencias 📖", href="/referencias", active="exact", style=styles["nav_link"])
+        dbc.NavLink("Inicio \ud83c\udfe0", href="/", active="exact", style=styles["nav_link"]),
+        dbc.NavLink("Carga Rápida \u26a1", href="/dash1", active="exact", style=styles["nav_link"]),
+        dbc.NavLink("Eficiencia \ud83d\udd0b", href="/dash2", active="exact", style=styles["nav_link"]),
+        dbc.NavLink("Precios \ud83d\udcb8", href="/dash3", active="exact", style=styles["nav_link"]),
+        dbc.NavLink("Conclusiones \ud83d\udd10", href="/conclusiones", active="exact", style=styles["nav_link"]),
+        dbc.NavLink("Referencias \ud83d\udcd6", href="/referencias", active="exact", style=styles["nav_link"])
     ], vertical=True, pills=True)
 ], style=styles["sidebar"])
 
@@ -181,15 +161,50 @@ app.layout = html.Div([
     content
 ], style={"backgroundColor": colors["background"], "minHeight": "100vh"})
 
+# Diccionario de rutas (con funciones lambda para evitar ejecuciones anticipadas)
+tabs_content = {
+    "/": lambda: home_tab,
+    "/dash1": carga_rapida,
+    "/dash2": eficiencia,
+    "/dash3": distribucion_precios,
+    "/conclusiones": lambda: html.Div([
+        html.H2("Conclusiones Clave", style=styles["header"]),
+        html.Div([
+            html.P("• Usamos Selenium y BeautifulSoup para agarrar datos reales del mercado europeo.", style=styles["card"]),
+            html.P("• Los dashboards muestran precios, eficiencia y carga rápida de varios modelos.", style=styles["card"]),
+            html.P("• Aprendimos a programar, analizar datos y a trabajar en equipo.", style=styles["card"])
+        ], style={"maxWidth": "850px", "margin": "auto"})
+    ]),
+    "/referencias": lambda: html.Div([
+        html.H2("Referencias y Repositorio GitHub", style=styles["header"]),
+        html.Ul([
+            html.Li(html.A("EV Database", href="https://ev-database.org", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
+            html.Li(html.A("BeautifulSoup", href="https://www.crummy.com/software/BeautifulSoup/", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
+            html.Li(html.A("Selenium", href="https://www.selenium.dev/", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
+            html.Li(html.A("Pandas", href="https://pandas.pydata.org/", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"]),
+            html.Li(html.A("GitHub Repo", href="https://github.com/CamilaSanchez-01/PF_Programacion_Extraccion_Datos", target="_blank", style={"color": colors["primary"]}), style=styles["list_item"])
+        ], style=styles["card"])
+    ], style={"maxWidth": "850px", "margin": "auto"})
+}
+
 @callback(
     Output("page-content", "children"),
     Input("url", "pathname")
 )
 def display_page(pathname):
-    return tabs_content.get(pathname, html.Div([
+    layout_func = tabs_content.get(pathname)
+    if layout_func:
+        try:
+            return layout_func()
+        except Exception as e:
+            return html.Div([
+                html.H1("Error al cargar la página", style={"color": "red"}),
+                html.P(str(e), style=styles["card"])
+            ])
+    return html.Div([
         html.H1("404: Página no encontrada", style={"color": "red", "textAlign": "center", "marginTop": "3rem"}),
         html.P(f"Oops, la ruta '{pathname}' no existe.", style=styles["card"])
-    ]))
+    ])
 
 @callback(
     Output("hero-image", "style"),
@@ -205,7 +220,6 @@ def zoom_image(n_clicks):
 
 def dashboard_estructura():
     app.run(debug=True)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
