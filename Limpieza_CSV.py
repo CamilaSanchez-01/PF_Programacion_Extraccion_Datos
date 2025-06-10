@@ -56,6 +56,9 @@ def limpieza1():
     df["Peso(kg)"] = df["Peso(kg)"].str.replace("kg", "", regex=False)
     df["Peso(kg)"] = pd.to_numeric(df["Peso(kg)"], errors="coerce")
 
+    # Eliminar filas con datos críticos nulos
+    df.dropna(subset=["Rango(Km)", "Bateria(kWh)", "Eficiencia(Wh/km)"], inplace=True)
+
     # 3. Eliminar duplicados por Marca + Modelo
     df.drop_duplicates(subset=["Marca", "Modelo"], keep="first", inplace=True)
 
@@ -73,7 +76,16 @@ def limpieza1():
     df = df[columnas_orden]
 
     # 5. Guardar el archivo limpio
-    df.to_csv("Dataset/carros_limpio.csv", index=False)
+    df.to_csv("Dataset/carros_limpio.csv", index=False, encoding="utf-8-sig")
+
+    # Reportes de validación
+    print("--Reporte de Limpieza completada.--")
+    print("Primeras filas:")
+    print(df.head())
+    print("\nTipos de datos:")
+    print(df.dtypes)
+    print("\nNulos por columna:")
+    print(df.isna().sum())
 
     print("Limpieza completada - Archivo limpio guardado:")
     print(df.head())
