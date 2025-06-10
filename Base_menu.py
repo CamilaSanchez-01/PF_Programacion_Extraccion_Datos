@@ -121,7 +121,7 @@ class SitiosWeb:
         # Función para iniciar el scraping en la primera tienda y guardar los resultados
         try:
             messagebox.showinfo("Buscando", "Buscando en tienda...")
-            productos = tienda1(1)
+            productos = tienda1(32)#<--ESTO CONTROLA LA CANTIDAD DE PAGINAS A RECORRER
             if productos:
                 self.guardar_csv(productos)
                 messagebox.showinfo("Éxito", "Datos guardados correctamente")
@@ -136,7 +136,7 @@ class SitiosWeb:
             dbConexion = connect(
                 host="localhost",
                 user="root",
-                password="123456789",
+                password="12345678",
                 database="ev_db"
             )
             messagebox.showinfo("Conexión", "¡Conexión exitosa con SQL!")
