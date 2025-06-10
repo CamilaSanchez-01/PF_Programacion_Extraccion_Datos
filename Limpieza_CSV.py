@@ -1,6 +1,7 @@
 import pandas as pd
 from Web_Scrapping_Link1 import tienda1
 
+
 def limpieza1():
     # Cargar el archivo CSV
     df = pd.read_csv("Dataset/carros.csv", sep=",")
@@ -18,11 +19,11 @@ def limpieza1():
         if columna in df.columns:
             col_usd = columna.replace("€", "USD").replace("£", "USD")
 
-            df[columna + "_num"] = df[columna].str.replace("€", "", regex=False)\
-                                              .str.replace("£", "", regex=False)\
-                                              .str.replace(".", "", regex=False)\
-                                              .str.replace(",", "")\
-                                              .str.strip()
+            df[columna + "_num"] = df[columna].str.replace("€", "", regex=False) \
+                .str.replace("£", "", regex=False) \
+                .str.replace(".", "", regex=False) \
+                .str.replace(",", "") \
+                .str.strip()
             df[columna + "_num"] = pd.to_numeric(df[columna + "_num"], errors="coerce")
 
             tasa = tasa_euro_usd if "€" in columna else tasa_gbp_usd
@@ -33,8 +34,8 @@ def limpieza1():
             df.drop([columna, columna + "_num"], axis=1, inplace=True)
         else:
             print(f"Columna '{columna}' no encontrada en el archivo CSV.")
-            
-#Renombre de columnas y tipos de datos por problemas de formato
+
+    # Renombrar columnas para estandarizar
     df.rename(columns={
         "Rango": "Rango(Km)",
         "Eficiencia": "Eficiencia(Wh/km)",
@@ -42,6 +43,7 @@ def limpieza1():
         "Peso": "Peso(kg)"
     }, inplace=True)
 
+    # Convertir strings numéricos a valores reales
     df["Rango(Km)"] = df["Rango(Km)"].str.replace("km", "", regex=False)
     df["Rango(Km)"] = pd.to_numeric(df["Rango(Km)"], errors="coerce")
 
@@ -54,7 +56,10 @@ def limpieza1():
     df["Peso(kg)"] = df["Peso(kg)"].str.replace("kg", "", regex=False)
     df["Peso(kg)"] = pd.to_numeric(df["Peso(kg)"], errors="coerce")
 
-    # 3. Reordenar columnas
+    # 3. Eliminar duplicados por Marca + Modelo
+    df.drop_duplicates(subset=["Marca", "Modelo"], keep="first", inplace=True)
+
+    # 4. Reordenar columnas
     columnas_orden = [
         "Marca", "Modelo",
         "Alemania (USD)", "Países Bajos (USD)", "Reino Unido (USD)",
@@ -67,7 +72,7 @@ def limpieza1():
 
     df = df[columnas_orden]
 
-    # 4. Guardar el archivo limpio
+    # 5. Guardar el archivo limpio
     df.to_csv("Dataset/carros_limpio.csv", index=False)
 
     print("Limpieza completada - Archivo limpio guardado:")
