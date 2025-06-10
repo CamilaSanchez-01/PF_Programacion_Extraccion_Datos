@@ -35,7 +35,7 @@ def tienda1(paginas):
                 Marca = "No disponible"
                 Modelo = "No diponible"
 
-            #Precio = item.find("div", class_="price_buy archive", style="vertical-align: inherit; )#cambie este VC
+            
 
             # Obtener todos los divs de clase 'price_buy archive'
             precios_divs = item.find_all("div", class_="price_buy archive")
