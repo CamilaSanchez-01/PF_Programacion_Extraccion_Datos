@@ -142,7 +142,7 @@ def figuras(Marca):
 
     # Top 5 autos con mayor y menor carga rapida
     top_mayor = df_marca.sort_values(by="Carga_Rapida", ascending=False).head(5)
-    top_menor = df_marca.sort_values(by="Carga_Rapida", ascending=True).head(5)
+    top_menor = df_marca.sort_values(by="Carga_Rapida").tail(5)
 
     # Graficos de barras para top autos con mayor carga rapida
     fig_mayor = px.bar(
