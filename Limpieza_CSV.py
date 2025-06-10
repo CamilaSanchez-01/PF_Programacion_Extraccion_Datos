@@ -70,7 +70,7 @@ def limpieza1():
     # 4. Guardar el archivo limpio
     df.to_csv("Dataset/carros_limpio.csv", index=False)
 
-    print("Limpieza completada - Archivo limpio guardado :")
+    print("Limpieza completada - Archivo limpio guardado:")
     print(df.head())
 
     return df
