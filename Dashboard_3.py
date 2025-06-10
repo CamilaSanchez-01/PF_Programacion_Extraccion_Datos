@@ -217,5 +217,5 @@ def figuras(marca, autonomia):
         title="Precio Promedio por Año"
     ) if not df_filtrado.empty else {}
 
-    # Regresamos todo para que se muestre en la app
+    # Regresamos
     return precio_prom, anios, segmentos, fig1, fig2, fig3

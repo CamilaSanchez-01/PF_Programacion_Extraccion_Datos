@@ -80,7 +80,7 @@ class SitiosWeb:
                                          font=styles["menu_button"], relief="raised")
         self.menucontrol.place(x=20, y=110)
 
-        # Opciones dentro del menú, cada una llama a un método para su función respectiva
+        # Opciones dentro del menú, cada una llama a uno
         self.menuOpciones = tk.Menu(self.menucontrol, tearoff=0,
                                     fg=colors["text_light"], bg=colors["secondary"],
                                     font=styles["menu_items"])
@@ -94,7 +94,7 @@ class SitiosWeb:
         self.menuOpciones.add_command(label="Salir", command=master.destroy)
         self.menucontrol["menu"] = self.menuOpciones
 
-        # Método que controla qué pasa si el usuario intenta cerrar la ventana
+        #cerrar ventana
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def on_closing(self):

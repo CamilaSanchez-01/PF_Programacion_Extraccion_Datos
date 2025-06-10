@@ -18,7 +18,7 @@ colors = {
     "shadow": "0 0 18px #00BFFF"
 }
 
-# Aquí están los estilos que vamos a usar en toda la app para que todo se vea chévere y consistente
+# Aquí están los estilos que vamos a usar en toda la app para que consistente
 styles = {
     "header": {
         "fontFamily": "'Orbitron', sans-serif",
