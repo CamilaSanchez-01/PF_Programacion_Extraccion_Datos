@@ -3,7 +3,7 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback, html, dcc
 
-# Paleta de colores para mantener consistencia en el diseño
+# Paleta de colores para mantener consistencia
 colors = {
     "background": "#0A0F24",
     "primary": "#00BFFF",
@@ -56,13 +56,14 @@ styles = {
 }
 
 def carga_rapida():
-    # Carga el archivo CSV con los datos limpios de autos eléctricos
-    # Construye la estructura visual de la página con filtros y gráficos
+    # Esta funcion carga el archivo CSV de datos limpios de carros electricos
+    # Y genera la estructura visual principal con los filtros y graficos para mostrar info sobre carga rapida y bateria
     df = pd.read_csv("Dataset/carros_limpio.csv")
 
     body = dbc.Container([
         html.H2("Carga Rápida 🔌", style=styles["header"]),
         dbc.Card([
+
             dbc.CardBody([
                 dbc.Label("Marca:", style=styles["label"]),
                 dcc.Dropdown(
@@ -113,7 +114,7 @@ def carga_rapida():
 
     return body
 
-# Callback para actualizar indicadores y gráficos según la marca seleccionada
+# Callback que actualiza los indicadores y graficos con base en la marca seleccionada en el dropdown
 @callback(
     Output("kpi-carga", "children"),
     Output("kpi-bateria", "children"),
@@ -125,25 +126,25 @@ def carga_rapida():
     Input("ddMarca", "value")
 )
 def figuras(Marca):
-    # Leer los datos del CSV
+    # Leer el CSV con los datos limpios
     df = pd.read_csv("Dataset/carros_limpio.csv")
 
-    # Si hay una marca seleccionada, filtrar por ella
+    # Filtrar por marca si se selecciono alguna
     if Marca:
         df_marca = df[df.Marca == Marca]
     else:
         df_marca = df
 
-    # Calcular indicadores principales
+    # Calculo de indicadores principales
     kpi_carga = f"{df_marca['Carga_Rapida'].mean():.2f} kW"
     kpi_bateria = f"{df_marca['Bateria(kWh)'].mean():.2f} kW"
     kpi_auto = df_marca.sort_values(by="Carga_Rapida", ascending=False).iloc[0]["Modelo"]
 
-    # Obtener top 5 autos con mayor y menor carga rápida
+    # Top 5 autos con mayor y menor carga rapida
     top_mayor = df_marca.sort_values(by="Carga_Rapida", ascending=False).head(5)
     top_menor = df_marca.sort_values(by="Carga_Rapida", ascending=True).head(5)
 
-    # Gráfico de barras para los autos con mayor carga rápida
+    # Graficos de barras para top autos con mayor carga rapida
     fig_mayor = px.bar(
         top_mayor,
         x="Modelo",
@@ -155,7 +156,7 @@ def figuras(Marca):
     )
     fig_mayor.update_layout(xaxis=dict(showticklabels=False))
 
-    # Gráfico de barras para los autos con menor carga rápida
+    # Graficos de barras para top autos con menor carga rapida
     fig_menor = px.bar(
         top_menor,
         x="Modelo",
@@ -167,7 +168,7 @@ def figuras(Marca):
     )
     fig_menor.update_layout(xaxis=dict(showticklabels=False))
 
-    # Gráfico de dispersión para rendimiento en carga rápida
+    # Grafico de dispersion que muestra el rendimiento en carga rapida con tamaño y color segun carga
     fig_rendi = px.scatter(
         df_marca,
         x="Carga_Vol",
@@ -180,7 +181,7 @@ def figuras(Marca):
         labels={"Carga_Vol": "Tamaño total de carga (kWh)"}
     )
 
-    # Gráfico de dispersión para modelos con mejor rendimiento por carga parcial
+    # Grafico de dispersion para mostrar modelos con mejor rendimiento por parada de carga
     fig_carga = px.scatter(
         df_marca,
         x="Rango_1_parada",
