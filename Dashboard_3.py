@@ -195,7 +195,7 @@ def figuras(marca, autonomia):
         color="Marca",
         template="plotly_dark",
         title="💵🏁 Relación Precio vs Eficiencia",labels={"Alemania (USD)": "Precio" },
-        hover_data=["Modelo", "Rango(Km)", "Segmento_mercado"]
+        hover_data=["Modelo", "Rango(Km)"]
     ) if not df_filtrado.empty else {}
 
     # Histograma para ver cómo se distribuyen los precios
@@ -208,14 +208,13 @@ def figuras(marca, autonomia):
     ) if not df_filtrado.empty else {}
 
     # Barra para ver cómo cambia el precio promedio por año
-    df_agrupado = df_filtrado.groupby("año")["Alemania (USD)"].mean().reset_index()
-    fig3 = px.bar(
-        df_agrupado,
-        x="año",
-        y="Alemania (USD)",
-        template="plotly_dark",labels={"Alemania (USD)": "Precio" },
-        title="➕💵 Precio Promedio por Año"
+    fig3 = px.scatter(
+        df_filtrado,
+        x="Precio_Rango",
+        y="Rango(Km)",
+        color="Modelo",hover_name="Modelo",
+        template="plotly_dark", labels={"Precio_Rango": "Rango_Precio (USD)"},
+        title="➕💵 Relación de Precio y Rango"
     ) if not df_filtrado.empty else {}
-
     # Regresamos
     return precio_prom, anios, segmentos, fig1, fig2, fig3
