@@ -1,15 +1,22 @@
 import pandas as pd
 from Web_Scrapping_Link1 import tienda1
 
-
 def limpieza1():
-    # Cargar el archivo CSV
-    df = pd.read_csv("Dataset/carros.csv", sep=",")
+    try:
+        # Cargar el archivo CSV
+        df = pd.read_csv("Dataset/carros.csv", sep=",")
+    except FileNotFoundError:
+        print("❌ Error: El archivo 'carros.csv' no se encontró.")
+        return None
+    except Exception as e:
+        print(f"❌ Error al cargar el archivo: {e}")
+        return None
 
-    # 1. Reemplazar celdas vacías, espacios o valores nulos por "No disponible"
+    # Reemplazar valores vacíos, nulos o solo espacios
     df.replace(["", " ", None], "No disponible", inplace=True)
+    df.fillna("No disponible", inplace=True)
 
-    # 2. Configurar columnas de precios por país
+    # Columnas de precio y ajuste del tipo de cambio
     columnas_precio = ["Alemania (€)", "Países Bajos (€)", "Reino Unido (£)"]
     tasa_euro_usd = 1.08
     tasa_gbp_usd = 1.27
@@ -18,24 +25,21 @@ def limpieza1():
     for columna in columnas_precio:
         if columna in df.columns:
             col_usd = columna.replace("€", "USD").replace("£", "USD")
-
             df[columna + "_num"] = df[columna].str.replace("€", "", regex=False) \
-                .str.replace("£", "", regex=False) \
-                .str.replace(".", "", regex=False) \
-                .str.replace(",", "") \
-                .str.strip()
+                                               .str.replace("£", "", regex=False) \
+                                               .str.replace(".", "", regex=False) \
+                                               .str.replace(",", "") \
+                                               .str.strip()
             df[columna + "_num"] = pd.to_numeric(df[columna + "_num"], errors="coerce")
-
             tasa = tasa_euro_usd if "€" in columna else tasa_gbp_usd
             df[col_usd] = (df[columna + "_num"] * tasa).round(2)
             df[col_usd] = df[col_usd].fillna("No disponible")
             columnas_usd.append(col_usd)
-
             df.drop([columna, columna + "_num"], axis=1, inplace=True)
         else:
-            print(f"Columna '{columna}' no encontrada en el archivo CSV.")
+            print(f"⚠️ Columna '{columna}' no encontrada en el archivo CSV.")
 
-    # Renombrar columnas para estandarizar
+    # Renombrar columnas
     df.rename(columns={
         "Rango": "Rango(Km)",
         "Eficiencia": "Eficiencia(Wh/km)",
@@ -43,26 +47,29 @@ def limpieza1():
         "Peso": "Peso(kg)"
     }, inplace=True)
 
-    # Convertir strings numéricos a valores reales
-    df["Rango(Km)"] = df["Rango(Km)"].str.replace("km", "", regex=False)
-    df["Rango(Km)"] = pd.to_numeric(df["Rango(Km)"], errors="coerce")
+    # Limpieza y conversión de valores numéricos
+    for col, unidad in [
+        ("Rango(Km)", "km"),
+        ("Eficiencia(Wh/km)", "Wh/km"),
+        ("Bateria(kWh)", "kWh"),
+        ("Peso(kg)", "kg")
+    ]:
+        if col in df.columns:
+            df[col] = df[col].str.replace(unidad, "", regex=False).str.strip()
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    df["Eficiencia(Wh/km)"] = df["Eficiencia(Wh/km)"].str.replace("Wh/km", "", regex=False)
-    df["Eficiencia(Wh/km)"] = pd.to_numeric(df["Eficiencia(Wh/km)"], errors="coerce")
-
-    df["Bateria(kWh)"] = df["Bateria(kWh)"].str.replace("kWh", "", regex=False)
-    df["Bateria(kWh)"] = pd.to_numeric(df["Bateria(kWh)"], errors="coerce")
-
-    df["Peso(kg)"] = df["Peso(kg)"].str.replace("kg", "", regex=False)
-    df["Peso(kg)"] = pd.to_numeric(df["Peso(kg)"], errors="coerce")
-
-    # Eliminar filas con datos críticos nulos
+    # Eliminar filas con nulos críticos
     df.dropna(subset=["Rango(Km)", "Bateria(kWh)", "Eficiencia(Wh/km)"], inplace=True)
 
-    # 3. Eliminar duplicados por Marca + Modelo
+    # Validación de rango lógico
+    df = df[df["Rango(Km)"] <= 1500]
+    df = df[df["Bateria(kWh)"] <= 200]
+    df = df[df["Eficiencia(Wh/km)"] <= 300]
+
+    # Eliminar duplicados
     df.drop_duplicates(subset=["Marca", "Modelo"], keep="first", inplace=True)
 
-    # 4. Reordenar columnas
+    # Validar si existen las columnas antes de reordenar
     columnas_orden = [
         "Marca", "Modelo",
         "Alemania (USD)", "Países Bajos (USD)", "Reino Unido (USD)",
@@ -73,21 +80,19 @@ def limpieza1():
         "Carga_bidireccional", "Imagen_tag", "Sitio"
     ]
 
-    df = df[columnas_orden]
+    columnas_existentes = [col for col in columnas_orden if col in df.columns]
+    df = df[columnas_existentes]
 
-    # 5. Guardar el archivo limpio
+    # Guardar archivo limpio
     df.to_csv("Dataset/carros_limpio.csv", index=False, encoding="utf-8-sig")
 
-    # Reportes de validación
-    print("--Reporte de Limpieza completada.--")
-    print("Primeras filas:")
+    # Reportes finales
+    print("✅ Limpieza completada.")
+    print("🔍 Primeras filas:")
     print(df.head())
-    print("\nTipos de datos:")
+    print("\n🔎 Tipos de datos:")
     print(df.dtypes)
-    print("\nNulos por columna:")
+    print("\n🚨 Nulos por columna:")
     print(df.isna().sum())
-
-    print("Limpieza completada - Archivo limpio guardado:")
-    print(df.head())
 
     return df
