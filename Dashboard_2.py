@@ -77,8 +77,12 @@ def eficiencia():
                             max=max_eficiencia,
                             step=5,
                             value=[min_eficiencia, max_eficiencia],
-                            marks=None,
-                            tooltip={"placement": "bottom", "always_visible": True}
+                            marks={
+                                min_eficiencia: str(min_eficiencia),
+                                max_eficiencia: str(max_eficiencia)
+                            },
+                            tooltip={"placement": "bottom", "always_visible": True},
+                            allowCross=False
                         )
                     ], md=8),
                     dbc.Col([
@@ -132,7 +136,32 @@ def eficiencia():
 
         dbc.Row([
             dbc.Col(dcc.Graph(id='histograma-eficiencia'), md=12)
-        ])
+        ]),
+        dbc.Row([
+            dbc.Col(
+                dbc.Card([
+                    dbc.CardHeader("🏆 Top 10 Autos Más Eficientes", style={
+                        **styles["label"],
+                        "fontSize": "1.5rem",
+                        "textAlign": "center",
+                        "background": "linear-gradient(90deg, #8A2BE2 0%, #00BFFF 100%)"
+                    }),
+                    dbc.CardBody([
+                        html.Div(id='top10-table-container'),
+                        html.Div(id='top10-message', style={
+                            "color": colors["primary"],
+                            "textAlign": "center",
+                            "marginTop": "1rem",
+                            "fontStyle": "italic"
+                        })
+                    ])
+                ], style={
+                    **styles["card"],
+                    "marginTop": "2rem"
+                }),
+                md=12
+            )
+        ]),
     ], fluid=True)
 
 @callback(
@@ -142,7 +171,9 @@ def eficiencia():
      Output('kpi-correlacion', 'children'),
      Output('scatter-eficiencia-peso', 'figure'),
      Output('scatter-eficiencia-rango', 'figure'),
-     Output('histograma-eficiencia', 'figure')],
+     Output('histograma-eficiencia', 'figure'),
+     Output('top10-table-container', 'children'),
+     Output('top10-message', 'children')],
     [Input('eficiencia-slider', 'value'),
      Input('marca-filter', 'value')]
 )
@@ -166,6 +197,10 @@ def update_dashboard(eficiencia_range, marca_seleccionada):
 
         if df_filtered.empty:
             raise ValueError("No hay datos con los filtros seleccionados")
+
+        top10_df = df_filtered.nsmallest(10, 'Eficiencia(Wh/km)')[['Marca', 'Modelo', 'Eficiencia(Wh/km)']]
+        top10_df['Ranking'] = range(1, len(top10_df) + 1)
+        top10_df = top10_df[['Ranking', 'Marca', 'Modelo', 'Eficiencia(Wh/km)']]
 
         eficiencia_promedio = f"{df_filtered['Eficiencia(Wh/km)'].mean():.1f}"
         idx_min = df_filtered['Eficiencia(Wh/km)'].idxmin()
@@ -207,6 +242,52 @@ def update_dashboard(eficiencia_range, marca_seleccionada):
             title='🚙 Distribución de Eficiencia'
         )
 
+        top10_df = df_filtered.nsmallest(10, 'Eficiencia(Wh/km)')[['Marca', 'Modelo', 'Eficiencia(Wh/km)']]
+        top10_df['Ranking'] = range(1, len(top10_df) + 1)
+        top10_df = top10_df[['Ranking', 'Marca', 'Modelo', 'Eficiencia(Wh/km)']]
+
+        # Crear tabla con estilo neón
+        if len(top10_df) >= 3:  # Mínimo 3 autos para mostrar la tabla
+            table_header = [
+                html.Thead(html.Tr([
+                    html.Th("Posición", style={"width": "10%"}),
+                    html.Th("Marca", style={"width": "25%"}),
+                    html.Th("Modelo", style={"width": "40%"}),
+                    html.Th("Eficiencia (Wh/km)", style={"width": "25%"})
+                ]), style={"backgroundColor": colors["card_bg"]})
+            ]
+
+            table_rows = []
+            for _, row in top10_df.iterrows():
+                trophy = "🥇" if row['Ranking'] == 1 else (
+                    "🥈" if row['Ranking'] == 2 else ("🥉" if row['Ranking'] == 3 else "🏅"))
+                table_rows.append(html.Tr([
+                    html.Td(f"{trophy} {row['Ranking']}", style={"color": colors["primary"]}),
+                    html.Td(row['Marca']),
+                    html.Td(row['Modelo']),
+                    html.Td(f"{row['Eficiencia(Wh/km)']:.1f}", style={"fontWeight": "bold"})
+                ]))
+
+            table_body = [html.Tbody(table_rows)]
+
+            top10_table = dbc.Table(
+                table_header + table_body,
+                bordered=True,
+                hover=True,
+                responsive=True,
+                striped=True,
+                style={
+                    "color": colors["text_light"],
+                    "backgroundColor": colors["card_bg"],
+                    "border": f"1px solid {colors['primary']}",
+                    "boxShadow": colors["shadow"]
+                }
+            )
+            message = ""
+        else:
+            top10_table = html.Div()
+            message = "ℹ️ No hay suficientes autos para mostrar el top 10 (mínimo 3 requeridos)"
+
         return (
             eficiencia_promedio,
             modelo_eficiente,
@@ -214,10 +295,14 @@ def update_dashboard(eficiencia_range, marca_seleccionada):
             correlacion,
             fig_scatter_peso,
             fig_scatter_rango,
-            fig_hist
+            fig_hist,
+            top10_table,  # Nueva salida
+            message  # Nueva salida
         )
 
     except Exception as e:
         print(f"Error: {e}")
         empty_fig = px.scatter(title="No hay datos disponibles")
-        return ("N/A", "N/A", "N/A", "N/A", empty_fig, empty_fig, empty_fig)
+        return ("N/A", "N/A", "N/A", "N/A", empty_fig, empty_fig, empty_fig, html.Div(),
+                "⚠️ No hay datos disponibles con los filtros seleccionados")
+
