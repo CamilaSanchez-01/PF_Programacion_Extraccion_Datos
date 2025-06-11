@@ -222,7 +222,7 @@ def figuras(marca, autonomia):
         x="Precio_Rango",
         y="Rango(Km)",
         color="Modelo",hover_name="Modelo",
-        template="plotly_dark", labels={"Precio_Rango": "Rango_Precio (USD)"},
+        template="plotly_dark", labels={"Precio_Rango": "Rango_Precio (USD) "},
         title="➕💵 Relación de Precio y Rango"
     ) if not df_filtrado.empty else {}
     # Regresamos
