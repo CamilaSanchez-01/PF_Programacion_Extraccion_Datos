@@ -58,10 +58,25 @@ def limpieza1():
             df[col] = df[col].str.replace(unidad, "", regex=False).str.strip()
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Eliminar filas con nulos críticos
+    # Eliminar filas con datos críticos nulos
+    # Estas columnas representan características técnicas esenciales del vehículo eléctrico:
+    # - "Rango(Km)": autonomía estimada por carga completa
+    # - "Bateria(kWh)": capacidad de la batería
+    # - "Eficiencia(Wh/km)": consumo energético por kilómetro
+    # Si alguna de estas está vacía o no es numéricamente válida, la fila no es útil para análisis comparativos,
+    # por lo tanto, se elimina.
     df.dropna(subset=["Rango(Km)", "Bateria(kWh)", "Eficiencia(Wh/km)"], inplace=True)
 
-    # Validación de rango lógico
+
+    
+    # Validación de rango lógico y datos atipicos
+    # Se eliminan posibles errores o valores extremos atípicos que podrían distorsionar visualizaciones o análisis.
+    # Estos límites se basan en máximos realistas del mercado actual de vehículos eléctricos:
+    # - Rango(Km) realista: máximo 1500 km (por ejemplo, Lucid Air ronda los 800 km)
+    # - Bateria(kWh): hasta 200 kWh (Mercedes Vision EQXX tiene ~100 kWh)
+    # - Eficiencia(Wh/km): hasta 300 Wh/km (valores superiores suelen indicar errores)
+    # Valores por encima de estos límites pueden ser errores de extracción, formateo o unidades mal interpretadas.
+
     df = df[df["Rango(Km)"] <= 1500]
     df = df[df["Bateria(kWh)"] <= 200]
     df = df[df["Eficiencia(Wh/km)"] <= 300]
