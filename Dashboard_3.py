@@ -126,15 +126,15 @@ def distribucion_precios():
 
             dbc.Col(dbc.Card([
                 dbc.CardBody([
-                    html.H6("🏁 Años Analizados", className="card-title"),
-                    html.H4(id="kpi_anios", className="card-text")
+                    html.H6("🚀 Auto Más Caro", className="card-title"),
+                    html.H4(id="kpi_mas_caro", className="card-text")
                 ])
             ], style=styles["card"]), md=4),
 
             dbc.Col(dbc.Card([
                 dbc.CardBody([
-                    html.H6("🚗 Segmentos Detectados", className="card-title"),
-                    html.H4(id="kpi_segmentos", className="card-text")
+                    html.H6("💲 Auto Más Barato", className="card-title"),
+                    html.H4(id="kpi_mas_barato", className="card-text")
                 ])
             ], style=styles["card"]), md=4),
         ], className="mb-4"),
@@ -146,7 +146,7 @@ def distribucion_precios():
         ]),
 
         dbc.Row([
-            dbc.Col(dcc.Graph(id="graf_precio_anio"), md=12),
+            dbc.Col(dcc.Graph(id="graf_precio_rango"), md=12),
         ]),
     ], fluid=True)
 
@@ -155,11 +155,11 @@ def distribucion_precios():
 @callback(
     # Aquí actualizamos todo cuando cambias algún filtro
     Output("kpi_precio", "children"),
-    Output("kpi_anios", "children"),
-    Output("kpi_segmentos", "children"),
+    Output("kpi_mas_caro", "children"),
+    Output("kpi_mas_barato", "children"),
     Output("graf_precio_eficiencia", "figure"),
     Output("graf_dist_precios", "figure"),
-    Output("graf_precio_anio", "figure"),
+    Output("graf_precio_rango", "figure"),
     Input("filtro_marca", "value"),
     Input("filtro_autonomia", "value")
 )
@@ -170,7 +170,7 @@ def figuras(marca, autonomia):
     except FileNotFoundError:
         raise Exception("❌ No encuentro el archivo 'carros_limpio.csv', checa que la ruta esté bien")
 
-    df["año"] = pd.to_datetime("today").year
+
     df["Alemania (USD)"] = pd.to_numeric(df["Alemania (USD)"], errors="coerce")
     df.dropna(subset=["Alemania (USD)", "Rango(Km)"], inplace=True)
 
@@ -184,8 +184,17 @@ def figuras(marca, autonomia):
 
     # KPIs que mostramos arriba, con chequeo por si no hay datos
     precio_prom = f"${df_filtrado['Alemania (USD)'].mean():,.0f}" if not df_filtrado.empty else "N/A"
-    anios = df_filtrado["año"].nunique() if not df_filtrado.empty else "N/A"
-    segmentos = df_filtrado["Segmento_mercado"].nunique() if not df_filtrado.empty else "N/A"
+
+
+    mas_caro = (
+        df_filtrado.loc[df_filtrado["Alemania (USD)"].idxmax(), "Modelo"]
+        if not df_filtrado.empty else "N/A"
+    )
+
+    mas_barato = (
+        df_filtrado.loc[df_filtrado["Alemania (USD)"].idxmin(), "Modelo"]
+        if not df_filtrado.empty else "N/A"
+    )
 
     # Gráfico para ver precio vs eficiencia
     fig1 = px.scatter(
@@ -207,7 +216,7 @@ def figuras(marca, autonomia):
         title="⚖️💸 Distribución de Precios"
     ) if not df_filtrado.empty else {}
 
-    # Barra para ver cómo cambia el precio promedio por año
+    # Gráfico para ver el rango de precios vs el rango
     fig3 = px.scatter(
         df_filtrado,
         x="Precio_Rango",
@@ -217,4 +226,4 @@ def figuras(marca, autonomia):
         title="➕💵 Relación de Precio y Rango"
     ) if not df_filtrado.empty else {}
     # Regresamos
-    return precio_prom, anios, segmentos, fig1, fig2, fig3
+    return precio_prom, mas_caro, mas_barato, fig1, fig2, fig3
