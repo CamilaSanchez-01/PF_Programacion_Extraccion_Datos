@@ -53,10 +53,15 @@ def eficiencia():
         df = pd.read_csv("Dataset/carros_limpio.csv")
         df = df.dropna(subset=['Eficiencia(Wh/km)', 'Peso(kg)'])
         marcas = sorted(df['Marca'].dropna().unique())
+        min_eficiencia = int(df['Eficiencia(Wh/km)'].min())
+        max_eficiencia = int(df['Eficiencia(Wh/km)'].max())
+
     except Exception as e:
         print(f"Error al cargar datos: {e}")
         marcas = []
         df = pd.DataFrame()
+        min_eficiencia = 100
+        max_eficiencia = 250
 
     return dbc.Container([
         html.H1("Análisis de Eficiencia Energética", style=styles["header"]),
@@ -68,13 +73,10 @@ def eficiencia():
                         html.Label("Rango de Eficiencia (Wh/km):", style=styles["label"]),
                         dcc.RangeSlider(
                             id='eficiencia-slider',
-                            min=100 if df.empty else int(df['Eficiencia(Wh/km)'].min()),
-                            max=250 if df.empty else int(df['Eficiencia(Wh/km)'].max()),
+                            min=min_eficiencia,
+                            max=max_eficiencia,
                             step=5,
-                            value=[100, 250] if df.empty else [
-                                int(df['Eficiencia(Wh/km)'].quantile(0.1)),
-                                int(df['Eficiencia(Wh/km)'].quantile(0.9))
-                            ],
+                            value=[min_eficiencia, max_eficiencia],
                             marks=None,
                             tooltip={"placement": "bottom", "always_visible": True}
                         )
@@ -148,6 +150,13 @@ def update_dashboard(eficiencia_range, marca_seleccionada):
     try:
         df = pd.read_csv("Dataset/carros_limpio.csv")
         df = df.dropna(subset=['Eficiencia(Wh/km)', 'Peso(kg)'])
+
+        min_val = int(df['Eficiencia(Wh/km)'].min())
+        max_val = int(df['Eficiencia(Wh/km)'].max())
+        eficiencia_range = [
+            max(eficiencia_range[0], min_val),  # No menor que el mínimo real
+            min(eficiencia_range[1], max_val)  # No mayor que el máximo real
+        ]
 
         mask = (df['Eficiencia(Wh/km)'] >= eficiencia_range[0]) & (df['Eficiencia(Wh/km)'] <= eficiencia_range[1])
         if marca_seleccionada:
