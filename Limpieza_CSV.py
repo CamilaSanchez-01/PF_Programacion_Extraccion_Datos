@@ -83,6 +83,19 @@ def limpieza1():
 
     # Eliminar duplicados
     df.drop_duplicates(subset=["Marca", "Modelo"], keep="first", inplace=True)
+    
+    #  Filtrar marcas con más de 1 modelo
+    conteo_marcas = df['Marca'].value_counts()
+    print(" Modelos por marca:")
+    print(conteo_marcas)
+
+    marcas_validas = conteo_marcas[conteo_marcas > 1].index.tolist()
+    total_antes = len(df)
+    df = df[df['Marca'].isin(marcas_validas)]
+    total_despues = len(df)
+
+    print(f"\n✅ Marcas eliminadas por tener solo 1 modelo: {conteo_marcas[conteo_marcas == 1].count()}")
+    print(f"- Registros eliminados: {total_antes - total_despues}")
 
     # Validar si existen las columnas antes de reordenar
     columnas_orden = [
@@ -103,11 +116,11 @@ def limpieza1():
 
     # Reportes finales
     print("✅ Limpieza completada.")
-    print("🔍 Primeras filas:")
+    print("-- Primeras filas:")
     print(df.head())
-    print("\n🔎 Tipos de datos:")
+    print("\n-- Tipos de datos:")
     print(df.dtypes)
-    print("\n🚨 Nulos por columna:")
+    print("\n-- Nulos por columna:")
     print(df.isna().sum())
 
     return df
